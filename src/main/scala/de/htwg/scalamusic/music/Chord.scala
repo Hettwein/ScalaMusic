@@ -7,7 +7,7 @@ case class Chord(root: Pitch = Pitch(), quality: ChordQuality.Value = ChordQuali
     case ChordQuality.Minor => val scale = new MinorScale(root); Seq(root, scale.getDegreePitch(ScaleDegree.III), scale.getDegreePitch(ScaleDegree.V))
   }
 
-  override def asLy: String = s"""< ${music.foldLeft("")((s, m) => s + m.asLy + " ")}>${duration.denominator}"""
+  override def asLy: String = s"""< ${music.foldLeft("")((s, m) => s + m.asLy + " ")}>${if (duration.numerator == 1) duration.denominator else duration.denominator / 2 + "."}"""
   override def asDSL: String = s"""< ${music.foldLeft("")((s, m) => s + m.asDSL + " ")}>"""
 }
 

@@ -1,6 +1,7 @@
 package de.htwg.scalamusic.music
 
 import scala.util.parsing.combinator.RegexParsers
+import de.htwg.scalamusic.music.BassGenerator
 
 package object parser {
 
@@ -28,9 +29,9 @@ package object parser {
 
     def note: Parser[Note] = pitchClass ~ opt(pitchDecorator) ~
       opt(pitchOctave) ~ """([\d])""".r ~ opt(noteAdditional) ^^ {
-        case c ~ d ~ o ~ b ~ a =>
+        case c ~ d ~ o ~ b ~ Some(a) =>
           Note(Pitch(c, d.getOrElse(PitchDecorator.Blank),
-            o.getOrElse(0)), Beat(1, b.toInt))
+            o.getOrElse(0)), if(a == ".") Beat(3, 2 * b.toInt) else Beat(1, b.toInt))
       }
 
     def rest: Parser[Rest] = """([r,R])""".r ~ """([\d])""".r ^^ {
@@ -41,11 +42,11 @@ package object parser {
       ChordQuality(_)
     }
 
-    def chord: Parser[Chord] = pitch ~ chordQuality ~ """([\d]?)""".r ^^ {
-      case p ~ q ~ d => Chord(p, q, Beat(1, d.toInt))
+    def chord: Parser[Chord] = pitch ~ chordQuality ~ """([\d]?)""".r ~ opt(noteAdditional) ^^ {
+      case p ~ q ~ d ~ Some(a) => Chord(p, q, if(a == ".") Beat(3, 2 * d.toInt) else Beat(1, d.toInt))
     }
 
-    def voice: Parser[Voice] = opt("voice{") ~> rep1(note | rest | chord) <~ opt("}") ^^ {
+    def voice: Parser[Voice] = opt("{") ~> rep1(note | rest | chord) <~ opt("}") ^^ {
       case p => Voice(music = p)
     }
 
@@ -53,33 +54,34 @@ package object parser {
       case p => ChordProgression(music = p)
     }
 
-    //    def timeSig: Parser[TimeSignature] = """(\[\d,\d\])""".r ^^ {
-    //      case n => TimeSignature(n.)
-    //    }
-
     def key: Parser[Mode] = "key" ~> pitch ~ opt("""([m])""".r) ^^ {
       case p ~ Some(m) => MinorScale(p)
       case p ~ None => MajorScale(p)
     }
-    
+
     def clef: Parser[Clef.Value] = "clef" ~> """(treble|alto|tenor|bass)""".r ^^ {
       Clef(_)
     }
-    
-    def staff: Parser[Staff] = opt("staff<<") ~> opt(clef) ~ opt(key) ~ rep1(voice | chords) <~ opt(">>") ^^ {
+
+    def staff: Parser[Staff] = opt("<<") ~> opt(clef) ~ opt(key) ~ rep1(voice | chords) <~ opt(">>") ^^ {
       case None ~ None ~ m => Staff(music = m)
       case Some(c) ~ None ~ m => Staff(clef = c, music = m)
       case None ~ Some(k) ~ m => Staff(key = k, music = m)
       case Some(c) ~ Some(k) ~ m => Staff(c, k, m)
     }
 
-    def score: Parser[Score] = opt("score<<") ~> rep1(staff) <~ opt(">>") ^^ {
-      case s => Score(music = s)
+    def timeSignature: Parser[TimeSignature] = """(\d)""".r ~ "/" ~ """(\d)""".r ^^ {
+      case d ~ _ ~ n => TimeSignature(d.toInt, n.toInt)
     }
 
-    def music: Parser[MusicDSL] = score | chords | voice | chord | note | rest | pitch // | score
+    def score: Parser[Score] = opt("<<") ~> opt(timeSignature) ~ rep1(staff) <~ opt(">>") ^^ {
+      case None ~ m => Score(music = m)
+      case Some(t) ~ m => Score(105, t, m)
+    }
 
-    def apply(input: String): MusicDSL = parseAll(music, input) match {
+//    def music: Parser[MusicDSL] = score// | chords | voice | chord | note | rest | pitch // | score
+
+    def apply(input: String): Score = parseAll(score, input) match {
       case Success(result, _) => result
       case failure: NoSuccess => scala.sys.error(failure.msg)
     }
@@ -90,6 +92,7 @@ package object parser {
     def m(args: Any*) = DSLParser(sc.parts(0))
     def show(args: Any*) = ShowAsLy(DSLParser(sc.parts(0)))
     def ly(args: Any*) = ShowAsLy.generateLy(DSLParser(sc.parts(0)))
+    def generate(args: Any*) = new BassGenerator(DSLParser(sc.parts(0))).generate()
   }
 
   object DSLGenerator {
@@ -127,24 +130,5 @@ package object parser {
       |
       |${m.asLy}""".stripMargin
     }
-    //    def generateLy(m: MusicDSL): String = {
-    //    		import java.util.Calendar
-    //    		s"""% ${Calendar.getInstance().getTime()}
-    //    		|
-    //    		|\\version "2.18.1"
-    //    		|
-    //    		|\\header { }
-    //    		|
-    //    		|\\layout { }
-    //    		|
-    //    		|\\paper { }
-    //    		|
-    //    		|\\score {
-    //    		|  \\new Staff {
-    //    		|    ${m.asLy}
-    //    		|  }
-    //    		|}""".stripMargin
-    //    }
-
   }
 }
