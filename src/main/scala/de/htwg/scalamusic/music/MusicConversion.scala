@@ -1,6 +1,6 @@
 package de.htwg.scalamusic.music
 
-trait MusicDSL {
+trait MusicConversion {
   //  /** Format this Music object as a LilyPond string. */
   //  def asLy: String
   //

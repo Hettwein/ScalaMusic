@@ -1,6 +1,6 @@
 package de.htwg.scalamusic.music
 
-trait Music extends MusicDSL
+trait Music extends MusicConversion
 
 trait MusicComposite[M <: Music] extends Music {
   var music: Seq[M]

@@ -14,7 +14,7 @@ trait HasKeySignatureSpelling {
   def getSpelling: KeySignatureSpelling.Value
 }
 
-trait Mode extends MusicDSL with HasKeySignatureSpelling {
+trait Mode extends MusicConversion with HasKeySignatureSpelling {
   def getDegreePitch(d: ScaleDegree.Value): Pitch
 }
 
@@ -44,7 +44,7 @@ case class MajorScale(root: Pitch) extends Mode {
   }
 
   override def asLy: String = s"""\\key ${root.asLy} \\major"""
-  override def asDSL: String = s"""<< >>"""
+  override def asDSL: String = s"""key ${root.asDSL}"""
 }
 
 case class MinorScale(root: Pitch) extends Mode {
@@ -73,5 +73,5 @@ case ScaleDegree.VII => Interval.getPitch(root, IntervalQuality.MinorSeventh, ge
 }
 
 override def asLy: String = s"""\\key ${root.asLy} \\minor"""
-override def asDSL: String = s"""<< >>"""
+override def asDSL: String = s"""key ${root.asDSL}m"""
 }

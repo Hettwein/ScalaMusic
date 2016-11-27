@@ -1,6 +1,6 @@
 package de.htwg.scalamusic.music
 
-case class Pitch(pitchClass: PitchClass.Value = PitchClass.C, decorator: PitchDecorator.Value = PitchDecorator.Blank, octave: Int = 0) extends MusicDSL {
+case class Pitch(pitchClass: PitchClass.Value = PitchClass.C, decorator: PitchDecorator.Value = PitchDecorator.Blank, octave: Int = 0) extends MusicConversion {
 
   def toPitchNumber: Int = {
     PitchClass.toPitchNumber(pitchClass) + PitchDecorator.toPitchNumber(decorator) + (octave * 12)

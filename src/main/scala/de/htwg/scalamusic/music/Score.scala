@@ -18,5 +18,5 @@ case class Score(tempo: Double = 115, timeSignature: TimeSignature = TimeSignatu
                               |  \\tempo ${timeSignature.denominator} = ${tempo.toInt}
                               |}
                               |}""".stripMargin
-  override def asDSL: String = s"""<< ${music.foldLeft("")((s, m) => s + m.asDSL + " ")}>>"""
+  override def asDSL: String = s"""( ${timeSignature.asDSL} ${music.foldLeft("")((s, m) => s + m.asDSL + " ")})"""
 }

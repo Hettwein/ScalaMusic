@@ -42,15 +42,19 @@ package object parser {
       ChordQuality(_)
     }
 
-    def chord: Parser[Chord] = pitch ~ chordQuality ~ """([\d]?)""".r ~ opt(noteAdditional) ^^ {
-      case p ~ q ~ d ~ Some(a) => Chord(p, q, if(a == ".") Beat(3, 2 * d.toInt) else Beat(1, d.toInt))
+    def chordName: Parser[Chord] = pitch ~ chordQuality ~ ":" ~ """([\d]?)""".r ~ opt(noteAdditional) ^^ {
+      case p ~ q ~ ":" ~ d ~ Some(a) => Chord(p, q, if(a == ".") Beat(3, 2 * d.toInt) else Beat(1, d.toInt))
     }
 
-    def voice: Parser[Voice] = opt("{") ~> rep1(note | rest | chord) <~ opt("}") ^^ {
+    def chord: Parser[Chord] = "<" ~ rep1(pitch) ~ ">" ~ """([\d]?)""".r ~ opt(noteAdditional) ^^ {
+      case "<" ~ p ~ ">" ~ d ~ Some(a) => Chord(p, if(a == ".") Beat(3, 2 * d.toInt) else Beat(1, d.toInt), 70)
+    }
+
+    def voice: Parser[Voice] = opt("(") ~> rep1(note | rest | chordName | chord) <~ opt(")") ^^ {
       case p => Voice(music = p)
     }
 
-    def chords: Parser[ChordProgression] = opt("chords{") ~> rep1(chord) <~ opt("}") ^^ {
+    def chords: Parser[ChordProgression] = opt("chords(") ~> rep1(chordName | chord) <~ opt(")") ^^ {
       case p => ChordProgression(music = p)
     }
 
@@ -63,7 +67,7 @@ package object parser {
       Clef(_)
     }
 
-    def staff: Parser[Staff] = opt("<<") ~> opt(clef) ~ opt(key) ~ rep1(voice | chords) <~ opt(">>") ^^ {
+    def staff: Parser[Staff] = opt("(") ~> opt(clef) ~ opt(key) ~ rep1(voice | chords) <~ opt(")") ^^ {
       case None ~ None ~ m => Staff(music = m)
       case Some(c) ~ None ~ m => Staff(clef = c, music = m)
       case None ~ Some(k) ~ m => Staff(key = k, music = m)
@@ -71,10 +75,10 @@ package object parser {
     }
 
     def timeSignature: Parser[TimeSignature] = """(\d)""".r ~ "/" ~ """(\d)""".r ^^ {
-      case d ~ _ ~ n => TimeSignature(d.toInt, n.toInt)
+      case d ~ "/" ~ n => TimeSignature(d.toInt, n.toInt)
     }
 
-    def score: Parser[Score] = opt("<<") ~> opt(timeSignature) ~ rep1(staff) <~ opt(">>") ^^ {
+    def score: Parser[Score] = opt("(") ~> opt(timeSignature) ~ rep1(staff) <~ opt(")") ^^ {
       case None ~ m => Score(music = m)
       case Some(t) ~ m => Score(105, t, m)
     }
@@ -89,19 +93,19 @@ package object parser {
   }
 
   implicit class DSLHelper(val sc: StringContext) extends AnyVal {
-    def m(args: Any*) = DSLParser(sc.parts(0))
+    def m(args: Any*) = DSLParser(sc.parts(0)).asDSL
     def show(args: Any*) = ShowAsLy(DSLParser(sc.parts(0)))
     def ly(args: Any*) = ShowAsLy.generateLy(DSLParser(sc.parts(0)))
     def generate(args: Any*) = new BassGenerator(DSLParser(sc.parts(0))).generate()
   }
 
   object DSLGenerator {
-    def apply(m: MusicDSL): String = m.asDSL
+    def apply(m: MusicConversion): String = m.asDSL
   }
 
   object ShowAsLy {
 
-    def apply(m: MusicDSL) = {
+    def apply(m: MusicConversion) = {
       import java.io._
       import sys.process._
 
@@ -116,7 +120,7 @@ package object parser {
       //      s"open ${fileName}.pdf".!
     }
 
-    def generateLy(m: MusicDSL): String = {
+    def generateLy(m: MusicConversion): String = {
       import java.util.Calendar
       s"""% ${Calendar.getInstance().getTime()}
       |
