@@ -1,9 +1,9 @@
 package de.htwg.scalamusic.music
 
-case class Score(tempo: Double = 115, timeSignature: TimeSignature = TimeSignature(), var music: Seq[Staff] = Seq()) extends MusicComposite[Staff] {
+case class Score(music: Seq[Staff] = Seq()) extends MusicConversion {
   override def asLy: String = s"""\\score {
                               |<<
-                              |  ${timeSignature.asLy}${music.foldLeft("")((s, m) => s + m.asLy + " ")}
+                              |  ${music.foldLeft("")((s, m) => s + m.asLy + " ")}
                               |>>
                               |\\layout { }
                               |\\midi {
@@ -15,8 +15,7 @@ case class Score(tempo: Double = 115, timeSignature: TimeSignature = TimeSignatu
                               |    \\Voice
                               |    \\consists "Staff_performer"
                               |  }
-                              |  \\tempo ${timeSignature.denominator} = ${tempo.toInt}
                               |}
                               |}""".stripMargin
-  override def asDSL: String = s"""( ${timeSignature.asDSL} ${music.foldLeft("")((s, m) => s + m.asDSL + " ")})"""
+  override def asDSL: String = s"""(${music.foldLeft("")((s, m) => s + m.asDSL + " ")})"""
 }

@@ -1,7 +1,6 @@
 package de.htwg.scalamusic.music
 
 import scala.util.parsing.combinator.RegexParsers
-import de.htwg.scalamusic.music.BassGenerator
 
 package object parser {
 
@@ -31,7 +30,7 @@ package object parser {
       opt(pitchOctave) ~ """([\d])""".r ~ opt(noteAdditional) ^^ {
         case c ~ d ~ o ~ b ~ Some(a) =>
           Note(Pitch(c, d.getOrElse(PitchDecorator.Blank),
-            o.getOrElse(0)), if(a == ".") Beat(3, 2 * b.toInt) else Beat(1, b.toInt))
+            o.getOrElse(0)), if (a == ".") Beat(3, 2 * b.toInt) else Beat(1, b.toInt), a == "~")
       }
 
     def rest: Parser[Rest] = """([r,R])""".r ~ """([\d])""".r ^^ {
@@ -43,19 +42,47 @@ package object parser {
     }
 
     def chordName: Parser[Chord] = pitch ~ chordQuality ~ ":" ~ """([\d]?)""".r ~ opt(noteAdditional) ^^ {
-      case p ~ q ~ ":" ~ d ~ Some(a) => Chord(p, q, if(a == ".") Beat(3, 2 * d.toInt) else Beat(1, d.toInt))
+      case p ~ q ~ ":" ~ d ~ Some(a) => Chord(p, q, if (a == ".") Beat(3, 2 * d.toInt) else Beat(1, d.toInt), a == "~")
     }
 
     def chord: Parser[Chord] = "<" ~ rep1(pitch) ~ ">" ~ """([\d]?)""".r ~ opt(noteAdditional) ^^ {
-      case "<" ~ p ~ ">" ~ d ~ Some(a) => Chord(p, if(a == ".") Beat(3, 2 * d.toInt) else Beat(1, d.toInt), 70)
+      case "<" ~ p ~ ">" ~ d ~ Some(a) => Chord(p, if (a == ".") Beat(3, 2 * d.toInt) else Beat(1, d.toInt), 70)
     }
 
-    def voice: Parser[Voice] = opt("(") ~> rep1(note | rest | chordName | chord) <~ opt(")") ^^ {
-      case p => Voice(music = p)
+    def tempo: Parser[Int] = "tempo" ~> """([\d]*)""".r ^^ {
+      case t => t.toInt
     }
 
-    def chords: Parser[ChordProgression] = opt("chords(") ~> rep1(chordName | chord) <~ opt(")") ^^ {
-      case p => ChordProgression(music = p)
+    def measure: Parser[Measure] = opt("|") ~> opt(timeSignature) ~ opt(key) ~ opt(clef) ~ opt(tempo) ~ rep1(note | rest | chordName | chord) <~ opt("|") ^^ {
+      case None ~ None ~ None ~ None ~ m => Measure(music = m)
+      case Some(t) ~ None ~ None ~ None ~ m => Measure(timeSignature = t, music = m, timeChange = true)
+      case Some(t) ~ Some(k) ~ None ~ None ~ m => Measure(timeSignature = t, key = k, music = m, timeChange = true, keyChange = true)
+      case Some(t) ~ None ~ Some(c) ~ None ~ m => Measure(timeSignature = t, clef = c, music = m, timeChange = true, clefChange = true)
+      case Some(t) ~ None ~ None ~ Some(s) ~ m => Measure(timeSignature = t, tempo = s.toInt, music = m, timeChange = true, tempoChange = true)
+      case Some(t) ~ Some(k) ~ Some(c) ~ None ~ m => Measure(timeSignature = t, key = k, clef = c, music = m, timeChange = true, keyChange = true, clefChange = true)
+      case Some(t) ~ Some(k) ~ None ~ Some(s) ~ m => Measure(timeSignature = t, key = k, tempo = s.toInt, music = m, timeChange = true, keyChange = true, tempoChange = true)
+      case Some(t) ~ Some(k) ~ Some(c) ~ Some(s) ~ m => Measure(t, k, c, s.toInt, m, true, true, true, true)
+      case None ~ Some(k) ~ None ~ None ~ m => Measure(key = k, music = m, keyChange = true)
+      case None ~ Some(k) ~ Some(c) ~ None ~ m => Measure(key = k, clef = c, music = m, keyChange = true, clefChange = true)
+      case None ~ Some(k) ~ None ~ Some(s) ~ m => Measure(key = k, tempo = s.toInt, music = m, keyChange = true, tempoChange = true)
+      case None ~ Some(k) ~ Some(c) ~ Some(s) ~ m => Measure(key = k, clef = c, tempo = s.toInt, music = m, keyChange = true, clefChange = true, tempoChange = true)
+      case None ~ None ~ Some(c) ~ None ~ m => Measure(clef = c, music = m, clefChange = true)
+      case None ~ None ~ Some(c) ~ Some(s) ~ m => Measure(clef = c, tempo = s.toInt, music = m, clefChange = true, tempoChange = true)
+      case None ~ None ~ None ~ Some(s) ~ m => Measure(tempo = s.toInt, music = m, tempoChange = true)
+    }
+
+    def voice: Parser[Voice] = opt("(") ~> opt(instrument) ~ rep1(measure) <~ opt(")") ^^ {
+      case None ~ m => new Voice(music = m)
+      case Some(i) ~ m => new Voice(m, i)
+    }
+
+    def instrument: Parser[String] = "instr" ~> (opt("\'") ~> """([a-z,A-Z,0-9, ]*)""".r) <~ opt("\'") ^^ {
+      case i => i
+    }
+
+    def chords: Parser[ChordProgression] = opt("chords(") ~> opt(instrument) ~ rep1(measure) <~ opt(")") ^^ {
+      case None ~ m => ChordProgression(music = m)
+      case Some(i) ~ m => ChordProgression(m, i)
     }
 
     def key: Parser[Mode] = "key" ~> pitch ~ opt("""([m])""".r) ^^ {
@@ -67,23 +94,17 @@ package object parser {
       Clef(_)
     }
 
-    def staff: Parser[Staff] = opt("(") ~> opt(clef) ~ opt(key) ~ rep1(voice | chords) <~ opt(")") ^^ {
-      case None ~ None ~ m => Staff(music = m)
-      case Some(c) ~ None ~ m => Staff(clef = c, music = m)
-      case None ~ Some(k) ~ m => Staff(key = k, music = m)
-      case Some(c) ~ Some(k) ~ m => Staff(c, k, m)
+    def staff: Parser[Staff] = opt("(") ~> rep1(voice | chords) <~ opt(")") ^^ {
+      case m => Staff(m)
     }
 
     def timeSignature: Parser[TimeSignature] = """(\d)""".r ~ "/" ~ """(\d)""".r ^^ {
       case d ~ "/" ~ n => TimeSignature(d.toInt, n.toInt)
     }
 
-    def score: Parser[Score] = opt("(") ~> opt(timeSignature) ~ rep1(staff) <~ opt(")") ^^ {
-      case None ~ m => Score(music = m)
-      case Some(t) ~ m => Score(105, t, m)
+    def score: Parser[Score] = opt("(") ~> rep1(staff) <~ opt(")") ^^ {
+      case m => Score(music = m)
     }
-
-//    def music: Parser[MusicDSL] = score// | chords | voice | chord | note | rest | pitch // | score
 
     def apply(input: String): Score = parseAll(score, input) match {
       case Success(result, _) => result
@@ -109,13 +130,12 @@ package object parser {
       import java.io._
       import sys.process._
 
-      val fileName = s"\\HTWG\\Bachelorarbeit\\ScalaMusic\\rc-${System.currentTimeMillis()}"
-      //      \HTWG\Bachelorarbeit\scala-music-dsl
+      val fileName = s"\\rc-${System.currentTimeMillis()}"
       val bw = new BufferedWriter(new FileWriter(fileName + ".ly"))
       bw.write(generateLy(m))
       bw.close()
 
-      val resultLy = Process("lilypond --pdf " + fileName + ".ly", new File("\\HTWG\\Bachelorarbeit\\ScalaMusic")).!!
+      val resultLy = Process("lilypond --pdf " + fileName + ".ly", new File("\\")).!!
       //      println(resultLy)
       //      s"open ${fileName}.pdf".!
     }

@@ -1,6 +1,6 @@
 package de.htwg.scalamusic.music
 
-case class Interval(root: Pitch = Pitch(), quality: IntervalQuality.Value, duration: Beat = Beat(), velocity: Int = 70) extends MusicElement {
+case class Interval(root: Pitch = Pitch(), quality: IntervalQuality.Value, duration: Beat = Beat(), tied: Boolean = false, velocity: Int = 70) extends MusicElement {
 
   val music = quality match {
     case _ => Seq(root)
@@ -17,14 +17,14 @@ object Interval {
     //    def pitchClass = PitchClass.valueStream.dropWhile(_ != from.pitchClass)(number - 1)
     var pitchClass = from.toPitchNumber + IntervalQuality.toPitchNumber(quality)
     var octave = from.octave
-    if(pitchClass > 11) {
+    if (pitchClass > 11) {
       pitchClass -= 12
       octave += 1
     }
-    
-    if(PitchClass.isIn(pitchClass)) {
+
+    if (PitchClass.isIn(pitchClass)) {
       Pitch(PitchClass.getClass(pitchClass), PitchDecorator.Blank, octave)
-    } else if(signs == KeySignatureSpelling.Sharps) {
+    } else if (signs == KeySignatureSpelling.Sharps) {
       Pitch(PitchClass.getClass(pitchClass - 1), PitchDecorator.Sharp, octave)
     } else {
       Pitch(PitchClass.getClass(pitchClass + 1), PitchDecorator.Flat, octave)
@@ -49,6 +49,7 @@ object IntervalQuality extends Enumeration {
     MinorSeventh -> 10,
     MajorSeventh -> 11,
     Octave -> 11,
-    Ninth -> 13)
-    def toPitchNumber(quality: IntervalQuality.Value): Int = midi(quality)
+    Ninth -> 13
+  )
+  def toPitchNumber(quality: IntervalQuality.Value): Int = midi(quality)
 }

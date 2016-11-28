@@ -1,9 +1,7 @@
 package de.htwg.scalamusic.music
 
-case class Note(pitch: Pitch = Pitch(), duration: Beat = Beat(), velocity: Int = 70) extends MusicElement {
-  //  val attribute = Map (
-  //    "dot" -> copy(duration = new Beat(3, 2 * this.duration.denominator)),
-  //    "tie" -> copy(duration = new Beat(3, 2 * this.duration.denominator))
-  //  )
-  override def toString() = if (duration.numerator == 1) pitch.toString() + duration.denominator else pitch.toString() + duration.denominator / 2 + "."
+case class Note(pitch: Pitch = Pitch(), duration: Beat = Beat(), tied: Boolean = false, velocity: Int = 70) extends MusicElement {
+
+  override def asLy(): String = s"""${pitch.toString().toLowerCase()}${if (duration.numerator == 1) duration.denominator else duration.denominator / 2 + "."}${if (tied) "~" else ""}"""
+  override def asDSL(): String = s"""${pitch.toString().toLowerCase()}${if (duration.numerator == 1) duration.denominator else duration.denominator / 2 + "."}${if (tied) "~" else ""}"""
 }

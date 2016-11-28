@@ -43,35 +43,35 @@ case class MajorScale(root: Pitch) extends Mode {
     case ScaleDegree.VII => Interval.getPitch(root, IntervalQuality.MajorSeventh, getSpelling)
   }
 
-  override def asLy: String = s"""\\key ${root.asLy} \\major"""
-  override def asDSL: String = s"""key ${root.asDSL}"""
+  override def asLy: String = s"""\\key ${root.asLy} \\major """
+  override def asDSL: String = s"""key ${root.asDSL} """
 }
 
 case class MinorScale(root: Pitch) extends Mode {
-	import KeySignatureSpelling._
-	
-	def getSpelling: KeySignatureSpelling.Value = root match {
-	case Pitch(_, PitchDecorator.Sharp, _) => Sharps
-	case Pitch(_, PitchDecorator.Flat, _) => Flats
-	case Pitch(PitchClass.A, _, _) => Sharps
-	case Pitch(PitchClass.E, _, _) => Sharps
-	case Pitch(PitchClass.B, _, _) => Sharps
-	case Pitch(PitchClass.F, _, _) => Flats
-	case Pitch(PitchClass.D, _, _) => Flats
-	case Pitch(PitchClass.C, _, _) => Flats
-	case Pitch(PitchClass.G, _, _) => Flats
-}
+  import KeySignatureSpelling._
 
-def getDegreePitch(d: ScaleDegree.Value): Pitch = d match {
-case ScaleDegree.I => root
-case ScaleDegree.II => Interval.getPitch(root, IntervalQuality.MajorSecond, getSpelling)
-case ScaleDegree.III => Interval.getPitch(root, IntervalQuality.MinorThird, getSpelling)
-case ScaleDegree.IV => Interval.getPitch(root, IntervalQuality.Fourth, getSpelling)
-case ScaleDegree.V => Interval.getPitch(root, IntervalQuality.Fifth, getSpelling)
-case ScaleDegree.VI => Interval.getPitch(root, IntervalQuality.MinorSixth, getSpelling)
-case ScaleDegree.VII => Interval.getPitch(root, IntervalQuality.MinorSeventh, getSpelling)
-}
+  def getSpelling: KeySignatureSpelling.Value = root match {
+    case Pitch(_, PitchDecorator.Sharp, _) => Sharps
+    case Pitch(_, PitchDecorator.Flat, _) => Flats
+    case Pitch(PitchClass.A, _, _) => Sharps
+    case Pitch(PitchClass.E, _, _) => Sharps
+    case Pitch(PitchClass.B, _, _) => Sharps
+    case Pitch(PitchClass.F, _, _) => Flats
+    case Pitch(PitchClass.D, _, _) => Flats
+    case Pitch(PitchClass.C, _, _) => Flats
+    case Pitch(PitchClass.G, _, _) => Flats
+  }
 
-override def asLy: String = s"""\\key ${root.asLy} \\minor"""
-override def asDSL: String = s"""key ${root.asDSL}m"""
+  def getDegreePitch(d: ScaleDegree.Value): Pitch = d match {
+    case ScaleDegree.I => root
+    case ScaleDegree.II => Interval.getPitch(root, IntervalQuality.MajorSecond, getSpelling)
+    case ScaleDegree.III => Interval.getPitch(root, IntervalQuality.MinorThird, getSpelling)
+    case ScaleDegree.IV => Interval.getPitch(root, IntervalQuality.Fourth, getSpelling)
+    case ScaleDegree.V => Interval.getPitch(root, IntervalQuality.Fifth, getSpelling)
+    case ScaleDegree.VI => Interval.getPitch(root, IntervalQuality.MinorSixth, getSpelling)
+    case ScaleDegree.VII => Interval.getPitch(root, IntervalQuality.MinorSeventh, getSpelling)
+  }
+
+  override def asLy: String = s"""\\key ${root.asLy} \\minor """
+  override def asDSL: String = s"""key ${root.asDSL}m """
 }

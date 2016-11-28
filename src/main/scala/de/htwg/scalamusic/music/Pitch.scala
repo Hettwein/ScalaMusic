@@ -33,7 +33,7 @@ object PitchClass extends Enumeration {
   def toPitchNumber(p: PitchClass): Int = midi.getOrElse(p, 0)
   def isIn(p: Int): Boolean = midi.map(_.swap).get(p) != None
   def getClass(p: Int): PitchClass.Value = midi.map(_.swap).get(p).get
-//  def valueStream = Stream.continually(PitchClass.values).flatten
+  //  def valueStream = Stream.continually(PitchClass.values).flatten
 }
 
 object PitchDecorator extends Enumeration {
@@ -96,47 +96,47 @@ object Pitch {
     10 -> "B-",
     11 -> "B"
   )
-  
-  private val sharpMidi = Map(
-		  0 -> "C",
-		  1 -> "C#",
-		  2 -> "D",
-		  3 -> "D#",
-		  4 -> "E",
-		  5 -> "F",
-		  6 -> "F#",
-		  7 -> "G",
-		  8 -> "G#",
-		  9 -> "A",
-		  10 -> "A#",
-		  11 -> "B"
-		  )
 
-//  private val toMidi = Map(
-//    "bis" -> 0,
-//    "c" -> 0,
-//    "cis" -> 1,
-//    "des" -> 1,
-//    "d" -> 2,
-//    "dis" -> 3,
-//    "es" -> 3,
-//    "ees" -> 3,
-//    "e" -> 4,
-//    "fes" -> 4,
-//    "eis" -> 5,
-//    "f" -> 5,
-//    "fis" -> 6,
-//    "ges" -> 6,
-//    "g" -> 7,
-//    "gis" -> 8,
-//    "as" -> 8,
-//    "aes" -> 8,
-//    "a" -> 9,
-//    "ais" -> 10,
-//    "bes" -> 10,
-//    "b" -> 11,
-//    "ces" -> 11
-//  )
+  private val sharpMidi = Map(
+    0 -> "C",
+    1 -> "C#",
+    2 -> "D",
+    3 -> "D#",
+    4 -> "E",
+    5 -> "F",
+    6 -> "F#",
+    7 -> "G",
+    8 -> "G#",
+    9 -> "A",
+    10 -> "A#",
+    11 -> "B"
+  )
+
+  //  private val toMidi = Map(
+  //    "bis" -> 0,
+  //    "c" -> 0,
+  //    "cis" -> 1,
+  //    "des" -> 1,
+  //    "d" -> 2,
+  //    "dis" -> 3,
+  //    "es" -> 3,
+  //    "ees" -> 3,
+  //    "e" -> 4,
+  //    "fes" -> 4,
+  //    "eis" -> 5,
+  //    "f" -> 5,
+  //    "fis" -> 6,
+  //    "ges" -> 6,
+  //    "g" -> 7,
+  //    "gis" -> 8,
+  //    "as" -> 8,
+  //    "aes" -> 8,
+  //    "a" -> 9,
+  //    "ais" -> 10,
+  //    "bes" -> 10,
+  //    "b" -> 11,
+  //    "ces" -> 11
+  //  )
 
   def apply(s: String): Pitch = s match {
     case r(p) => new Pitch(PitchClass(p), Blank, 0)
@@ -156,5 +156,5 @@ object Pitch {
     Pitch((midi.getOrElse(Math.abs((i + 48) % 12), "C") + octaves))
   }
 
-//  def apply(pitch: PitchClass.Value): Pitch = new Pitch(pitch, Blank, 0)
+  //  def apply(pitch: PitchClass.Value): Pitch = new Pitch(pitch, Blank, 0)
 }
