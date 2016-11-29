@@ -1,4 +1,4 @@
-package de.htwg.scalamusic.music
+package de.htwg.scalamusic
 
 case class Note(pitch: Pitch = Pitch(), duration: Beat = Beat(), tied: Boolean = false, velocity: Int = 70) extends MusicElement {
 

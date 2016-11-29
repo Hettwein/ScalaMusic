@@ -1,4 +1,4 @@
-package de.htwg.scalamusic.music
+package de.htwg.scalamusic
 
 trait MusicConversion {
   //  /** Format this Music object as a LilyPond string. */

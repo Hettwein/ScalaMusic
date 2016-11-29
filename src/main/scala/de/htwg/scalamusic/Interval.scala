@@ -1,4 +1,4 @@
-package de.htwg.scalamusic.music
+package de.htwg.scalamusic
 
 case class Interval(root: Pitch = Pitch(), quality: IntervalQuality.Value, duration: Beat = Beat(), tied: Boolean = false, velocity: Int = 70) extends MusicElement {
 

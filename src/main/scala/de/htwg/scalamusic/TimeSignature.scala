@@ -1,4 +1,4 @@
-package de.htwg.scalamusic.music
+package de.htwg.scalamusic
 
 case class TimeSignature(numerator: Int = 4, denominator: Int = 4) extends MusicConversion {
   override def asLy: String = s"""\\time ${numerator}/${denominator} """

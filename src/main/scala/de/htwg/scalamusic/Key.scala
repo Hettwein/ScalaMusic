@@ -1,4 +1,4 @@
-package de.htwg.scalamusic.music
+package de.htwg.scalamusic
 
 object ScaleDegree extends Enumeration {
   type ScaleDegree = Value

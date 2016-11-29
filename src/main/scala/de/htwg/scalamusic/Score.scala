@@ -1,4 +1,4 @@
-package de.htwg.scalamusic.music
+package de.htwg.scalamusic
 
 case class Score(music: Seq[Staff] = Seq()) extends MusicConversion {
   override def asLy: String = s"""\\score {

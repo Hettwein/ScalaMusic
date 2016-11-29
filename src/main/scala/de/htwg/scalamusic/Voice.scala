@@ -1,4 +1,4 @@
-package de.htwg.scalamusic.music
+package de.htwg.scalamusic
 
 class Voice(music: Seq[Measure] = Seq(), instrument: String = "") extends MusicConversion {
 

@@ -1,4 +1,4 @@
-package de.htwg.scalamusic.music
+package de.htwg.scalamusic
 
 case class Staff(music: Seq[Voice] = Seq()) extends MusicConversion {
   override def asLy: String = s"""|

@@ -1,6 +1,23 @@
-package de.htwg.scalamusic.music
+package de.htwg.scalamusic
 
 import scala.util.parsing.combinator.RegexParsers
+import de.htwg.scalamusic.TimeSignature
+import de.htwg.scalamusic.Voice
+import de.htwg.scalamusic.MusicConversion
+import de.htwg.scalamusic.Measure
+import de.htwg.scalamusic.Clef
+import de.htwg.scalamusic.Staff
+import de.htwg.scalamusic.ChordProgression
+import de.htwg.scalamusic.Note
+import de.htwg.scalamusic.Score
+import de.htwg.scalamusic.Mode
+import de.htwg.scalamusic.BassGenerator
+import de.htwg.scalamusic.Rest
+import de.htwg.scalamusic.PitchDecorator
+import de.htwg.scalamusic.PitchClass
+import de.htwg.scalamusic.Pitch
+import de.htwg.scalamusic.ChordQuality
+import de.htwg.scalamusic.Chord
 
 package object parser {
 

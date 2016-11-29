@@ -1,10 +1,11 @@
-package de.htwg.scalamusic.music
+package de.htwg.scalamusic
 
 case class Measure(
     timeSignature: TimeSignature = TimeSignature(),
     key: Mode = MajorScale(Pitch()),
     clef: Clef.Value = Clef.treble,
-    tempo: Int = 105, music: Seq[MusicElement] = Seq(),
+    tempo: Int = 105,
+    music: Seq[MusicElement] = Seq(),
     keyChange: Boolean = false,
     timeChange: Boolean = false,
     clefChange: Boolean = false,

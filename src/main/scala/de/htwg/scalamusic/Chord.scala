@@ -1,4 +1,6 @@
-package de.htwg.scalamusic.music
+package de.htwg.scalamusic
+
+import de.htwg.scalamusic._
 
 case class Chord(root: Pitch = Pitch(), quality: ChordQuality.Value = ChordQuality.Major, duration: Beat = Beat(1, 1), tied: Boolean = false, velocity: Int = 70) extends MusicElement {
 
