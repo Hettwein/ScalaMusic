@@ -1,23 +1,6 @@
 package de.htwg.scalamusic
 
 import scala.util.parsing.combinator.RegexParsers
-import de.htwg.scalamusic.TimeSignature
-import de.htwg.scalamusic.Voice
-import de.htwg.scalamusic.MusicConversion
-import de.htwg.scalamusic.Measure
-import de.htwg.scalamusic.Clef
-import de.htwg.scalamusic.Staff
-import de.htwg.scalamusic.ChordProgression
-import de.htwg.scalamusic.Note
-import de.htwg.scalamusic.Score
-import de.htwg.scalamusic.Mode
-import de.htwg.scalamusic.BassGenerator
-import de.htwg.scalamusic.Rest
-import de.htwg.scalamusic.PitchDecorator
-import de.htwg.scalamusic.PitchClass
-import de.htwg.scalamusic.Pitch
-import de.htwg.scalamusic.ChordQuality
-import de.htwg.scalamusic.Chord
 
 package object parser {
 
@@ -50,6 +33,10 @@ package object parser {
             o.getOrElse(0)), if (a == ".") Beat(3, 2 * b.toInt) else Beat(1, b.toInt), a == "~")
       }
 
+    def tuplet: Parser[Tuplet] = opt("(") ~> (rep1(note) <~ opt(")")) ~ """([\d])""".r ^^ {
+      case m ~ d => Tuplet(d.toInt, m)//n.map { m => m.asInstanceOf[Note].copy(duration = Beat(1, m.duration.denominator / 2 * d.toInt)) }
+    }
+
     def rest: Parser[Rest] = """([r,R])""".r ~ """([\d])""".r ^^ {
       case r ~ b => Rest(Beat(1, b.toInt))
     }
@@ -62,30 +49,30 @@ package object parser {
       case p ~ q ~ ":" ~ d ~ Some(a) => Chord(p, q, if (a == ".") Beat(3, 2 * d.toInt) else Beat(1, d.toInt), a == "~")
     }
 
-    def chord: Parser[Chord] = "<" ~ rep1(pitch) ~ ">" ~ """([\d]?)""".r ~ opt(noteAdditional) ^^ {
-      case "<" ~ p ~ ">" ~ d ~ Some(a) => Chord(p, if (a == ".") Beat(3, 2 * d.toInt) else Beat(1, d.toInt), 70)
-    }
+//    def chord: Parser[Chord] = "<" ~ rep1(pitch) ~ ">" ~ """([\d]?)""".r ~ opt(noteAdditional) ^^ {
+//      case "<" ~ p ~ ">" ~ d ~ Some(a) => Chord(p, if (a == ".") Beat(3, 2 * d.toInt) else Beat(1, d.toInt), 70)
+//    }
 
     def tempo: Parser[Int] = "tempo" ~> """([\d]*)""".r ^^ {
       case t => t.toInt
     }
 
-    def measure: Parser[Measure] = opt("|") ~> opt(timeSignature) ~ opt(key) ~ opt(clef) ~ opt(tempo) ~ rep1(note | rest | chordName | chord) <~ opt("|") ^^ {
-      case None ~ None ~ None ~ None ~ m => Measure(music = m)
-      case Some(t) ~ None ~ None ~ None ~ m => Measure(timeSignature = t, music = m, timeChange = true)
-      case Some(t) ~ Some(k) ~ None ~ None ~ m => Measure(timeSignature = t, key = k, music = m, timeChange = true, keyChange = true)
-      case Some(t) ~ None ~ Some(c) ~ None ~ m => Measure(timeSignature = t, clef = c, music = m, timeChange = true, clefChange = true)
-      case Some(t) ~ None ~ None ~ Some(s) ~ m => Measure(timeSignature = t, tempo = s.toInt, music = m, timeChange = true, tempoChange = true)
-      case Some(t) ~ Some(k) ~ Some(c) ~ None ~ m => Measure(timeSignature = t, key = k, clef = c, music = m, timeChange = true, keyChange = true, clefChange = true)
-      case Some(t) ~ Some(k) ~ None ~ Some(s) ~ m => Measure(timeSignature = t, key = k, tempo = s.toInt, music = m, timeChange = true, keyChange = true, tempoChange = true)
-      case Some(t) ~ Some(k) ~ Some(c) ~ Some(s) ~ m => Measure(t, k, c, s.toInt, m, true, true, true, true)
-      case None ~ Some(k) ~ None ~ None ~ m => Measure(key = k, music = m, keyChange = true)
-      case None ~ Some(k) ~ Some(c) ~ None ~ m => Measure(key = k, clef = c, music = m, keyChange = true, clefChange = true)
-      case None ~ Some(k) ~ None ~ Some(s) ~ m => Measure(key = k, tempo = s.toInt, music = m, keyChange = true, tempoChange = true)
-      case None ~ Some(k) ~ Some(c) ~ Some(s) ~ m => Measure(key = k, clef = c, tempo = s.toInt, music = m, keyChange = true, clefChange = true, tempoChange = true)
-      case None ~ None ~ Some(c) ~ None ~ m => Measure(clef = c, music = m, clefChange = true)
-      case None ~ None ~ Some(c) ~ Some(s) ~ m => Measure(clef = c, tempo = s.toInt, music = m, clefChange = true, tempoChange = true)
-      case None ~ None ~ None ~ Some(s) ~ m => Measure(tempo = s.toInt, music = m, tempoChange = true)
+    def measure: Parser[Measure] = opt("|") ~> opt(timeSignature) ~ opt(key) ~ opt(clef) ~ opt(tempo) ~ rep1(note | rest | chordName | tuplet) <~ opt("|") ^^ {
+      case None ~ None ~ None ~ None ~ m => Measure(music = m.flatten)
+      case Some(t) ~ None ~ None ~ None ~ m => Measure(timeSignature = t, music = m.flatten, timeChange = true)
+      case Some(t) ~ Some(k) ~ None ~ None ~ m => Measure(timeSignature = t, key = k, music = m.flatten, timeChange = true, keyChange = true)
+      case Some(t) ~ None ~ Some(c) ~ None ~ m => Measure(timeSignature = t, clef = c, music = m.flatten, timeChange = true, clefChange = true)
+      case Some(t) ~ None ~ None ~ Some(s) ~ m => Measure(timeSignature = t, tempo = s.toInt, music = m.flatten, timeChange = true, tempoChange = true)
+      case Some(t) ~ Some(k) ~ Some(c) ~ None ~ m => Measure(timeSignature = t, key = k, clef = c, music = m.flatten, timeChange = true, keyChange = true, clefChange = true)
+      case Some(t) ~ Some(k) ~ None ~ Some(s) ~ m => Measure(timeSignature = t, key = k, tempo = s.toInt, music = m.flatten, timeChange = true, keyChange = true, tempoChange = true)
+      case Some(t) ~ Some(k) ~ Some(c) ~ Some(s) ~ m => Measure(t, k, c, s.toInt, m.flatten, true, true, true, true)
+      case None ~ Some(k) ~ None ~ None ~ m => Measure(key = k, music = m.flatten, keyChange = true)
+      case None ~ Some(k) ~ Some(c) ~ None ~ m => Measure(key = k, clef = c, music = m.flatten, keyChange = true, clefChange = true)
+      case None ~ Some(k) ~ None ~ Some(s) ~ m => Measure(key = k, tempo = s.toInt, music = m.flatten, keyChange = true, tempoChange = true)
+      case None ~ Some(k) ~ Some(c) ~ Some(s) ~ m => Measure(key = k, clef = c, tempo = s.toInt, music = m.flatten, keyChange = true, clefChange = true, tempoChange = true)
+      case None ~ None ~ Some(c) ~ None ~ m => Measure(clef = c, music = m.flatten, clefChange = true)
+      case None ~ None ~ Some(c) ~ Some(s) ~ m => Measure(clef = c, tempo = s.toInt, music = m.flatten, clefChange = true, tempoChange = true)
+      case None ~ None ~ None ~ Some(s) ~ m => Measure(tempo = s.toInt, music = m.flatten, tempoChange = true)
     }
 
     def voice: Parser[Voice] = opt("(") ~> opt(instrument) ~ rep1(measure) <~ opt(")") ^^ {
