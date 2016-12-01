@@ -10,7 +10,7 @@ package object parser {
       PitchClass(_)
     }
 
-    def pitchDecorator: Parser[PitchDecorator.Value] = """(isis|is|eses|ses|es|s|[n|#|x|X|\-|_]?)""".r ^^ {
+    def pitchDecorator: Parser[PitchDecorator.Value] = """(isis|is|eses|ses|es|s|[n|#|x|X|\-]?)""".r ^^ {
       PitchDecorator(_)
     }
 
@@ -41,7 +41,7 @@ package object parser {
       case r ~ b => Rest(Beat(1, b.toInt))
     }
 
-    def chordQuality: Parser[ChordQuality.Value] = """([m|min|M|7|6|dim|aug|M7|m7|sus4|sus2|9])""".r ^^ {
+    def chordQuality: Parser[ChordQuality.Value] = """(min|.7|.6|.5|dim|aug|M7|m7|sus4|sus2|.9|M|m)?""".r ^^ {
       ChordQuality(_)
     }
 
