@@ -41,7 +41,7 @@ package object parser {
       case r ~ b => Rest(Beat(1, b.toInt))
     }
 
-    def chordQuality: Parser[ChordQuality.Value] = """(min|.7|.6|.5|dim|aug|M7|m7|sus4|sus2|.9|M|m)?""".r ^^ {
+    def chordQuality: Parser[ChordQuality.Value] = """(min|.7|.6|.5|dim|aug|M7|m7|.sus4|.sus2|.9|M|m)?""".r ^^ {
       ChordQuality(_)
     }
 
