@@ -33,7 +33,7 @@ package object parser {
             o.getOrElse(0)), if (a == ".") Beat(3, 2 * b.toInt) else Beat(1, b.toInt), a == "~")
       }
 
-    def tuplet: Parser[Tuplet] = opt("(") ~> (rep1(note) <~ opt(")")) ~ """([\d])""".r ^^ {
+    def tuplet: Parser[Tuplet] = opt("(") ~> (rep1(note | chordName) <~ opt(")")) ~ """([\d])""".r ^^ {
       case m ~ d => Tuplet(d.toInt, m)//n.map { m => m.asInstanceOf[Note].copy(duration = Beat(1, m.duration.denominator / 2 * d.toInt)) }
     }
 
