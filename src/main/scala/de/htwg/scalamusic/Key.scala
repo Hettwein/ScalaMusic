@@ -34,7 +34,7 @@ trait Mode extends MusicConversion with HasKeySignatureSpelling {
   def getDegreeIndex(p: Pitch): Int = { val idx = scale.indexOf(p); if(idx != -1) idx else if (getSpelling == KeySignatureSpelling.Flats) scale.indexOf(p.chromaticUp(getSpelling)) else scale.indexOf(p.chromaticDown(getSpelling)) }
   def stepUp(from: Pitch): Pitch = { val idx = scale.indexOf(from); if (idx < 6) scale(idx + 1) else scale(idx - 6)+ }
   //inKey(from).id//{val d = degree.map(_.swap).get(inKey(from)).get; if(d < 7) getDegreePitch(degree(d + 1)) else getDegreePitch(degree(d - 6))+}
-  def stepDown(from: Pitch): Pitch = { val idx = scale.indexOf(from); if (idx < 6) scale(idx - 1) else scale(idx + 6)- }
+  def stepDown(from: Pitch): Pitch = { val idx = scale.indexOf(from); if (idx > 0) scale(idx - 1) else scale(idx + 6)- }
   //val d = degree.map(_.swap).get(inKey(from)).get; if(d > 1) getDegreePitch(degree(d - 1)) else getDegreePitch(degree(d + 6))-}
 }
 

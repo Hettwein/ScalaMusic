@@ -141,14 +141,14 @@ package object parser {
       import java.io._
       import sys.process._
 
-      println("asdf")
-      println(new BassGenerator(DSLParser(m)).generate(style))
-      //      val fileName = s"\\rc-${System.currentTimeMillis()}" //////
-      //      val bw = new BufferedWriter(new FileWriter(fileName + ".ly"))
-      //      bw.write(new BassGenerator(DSLParser(m)).generate(style))
-      //      bw.close()
-      //
-      //      val resultLy = Process("lilypond --pdf " + fileName + ".ly", new File("\\")).!!
+//      println("asdf")
+//      println(new BassGenerator(DSLParser(m)).generate(style))
+            val fileName = s"\\rc-${System.currentTimeMillis()}" //////
+            val bw = new BufferedWriter(new FileWriter(fileName + ".ly"))
+            bw.write(new BassGenerator(DSLParser(m)).generate(style))
+            bw.close()
+      
+            val resultLy = Process("lilypond --pdf " + fileName + ".ly", new File("\\")).!!
     }
   }
 
