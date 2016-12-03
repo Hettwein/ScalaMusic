@@ -1,5 +1,7 @@
 package de.htwg.scalamusic
 
+import scala.language.postfixOps
+
 case class Pitch(pitchClass: PitchClass.Value = PitchClass.C, decorator: PitchDecorator.Value = PitchDecorator.Blank, octave: Int = 0) extends MusicConversion {
 
   def toPitchNumber: Int = {
@@ -10,7 +12,7 @@ case class Pitch(pitchClass: PitchClass.Value = PitchClass.C, decorator: PitchDe
   def - = copy(octave = octave - 1)
   
   def chromaticUp(sign: KeySignatureSpelling.Value) = Interval.getPitch(this, IntervalQuality.MinorSecond, sign)
-  def chromaticDown(sign: KeySignatureSpelling.Value) = Interval.getPitch(this, IntervalQuality.MajorSeventh, sign).-
+  def chromaticDown(sign: KeySignatureSpelling.Value) = Interval.getPitch(this, IntervalQuality.MajorSeventh, sign)-
     
   override def toString: String = {
     var octaves = "";

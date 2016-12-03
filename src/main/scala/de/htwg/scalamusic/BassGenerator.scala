@@ -76,12 +76,14 @@ class BassGenerator(val score: Score) {
           Pattern(Seq(note))
         }
       case "random" =>
+//        val rand = (Math.random() * (chordalNotes.size - 0.4) + time.denominator).floor.toInt
         val note = Note(chord.root-, new Beat(1, time.denominator))
         var p = Seq(note)
         var d = note.duration.getValue()
         while(d < chord.duration.getValue()) {
-          val r = (Math.random() * (chordalNotes.size - 0.4)).floor.toInt
-          val n = Note(chordalNotes(r)-, new Beat(1, time.denominator))
+          val diff = chord.duration.getValue() - d
+          val r = (Math.random() * (chordalNotes.size - 0.5)).floor.toInt
+          val n = if(Math.random() > 0.5 && diff > 1.0 / time.denominator) Note(chordalNotes(r)-, new Beat(1, time.denominator)) else Note(chordalNotes(r)-, new Beat(1, time.denominator * 2))
           p = p :+ n
           d += n.duration.getValue()
         }

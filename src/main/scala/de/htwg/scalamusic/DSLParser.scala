@@ -33,6 +33,14 @@ package object parser {
             o.getOrElse(0)), if (a == ".") Beat(3, 2 * b.toInt) else Beat(1, b.toInt), a == "~")
       }
 
+//    def tiedNote: Parser[Note] = note ~ rep1("~" ~ note) ^^ {
+//      case n ~ tn => {
+//         val notes = tn.map(_._2)
+//         val sum = notes.foldLeft(Beat(0, 1))((n, m) => n.sum(m.duration))
+//        n.copy(duration = n.duration.sum(sum), tied = true)
+//      }
+//    }
+
     def tuplet: Parser[Tuplet] = opt("(") ~> (rep1(note | chordName) <~ opt(")")) ~ """([\d])""".r ^^ {
       case m ~ d => Tuplet(d.toInt, m)
     }
@@ -135,12 +143,12 @@ package object parser {
 
       println("asdf")
       println(new BassGenerator(DSLParser(m)).generate(style))
-//      val fileName = s"\\rc-${System.currentTimeMillis()}" //////
-//      val bw = new BufferedWriter(new FileWriter(fileName + ".ly"))
-//      bw.write(new BassGenerator(DSLParser(m)).generate(style))
-//      bw.close()
-//
-//      val resultLy = Process("lilypond --pdf " + fileName + ".ly", new File("\\")).!!
+      //      val fileName = s"\\rc-${System.currentTimeMillis()}" //////
+      //      val bw = new BufferedWriter(new FileWriter(fileName + ".ly"))
+      //      bw.write(new BassGenerator(DSLParser(m)).generate(style))
+      //      bw.close()
+      //
+      //      val resultLy = Process("lilypond --pdf " + fileName + ".ly", new File("\\")).!!
     }
   }
 

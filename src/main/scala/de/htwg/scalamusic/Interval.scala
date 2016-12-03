@@ -17,6 +17,7 @@ object Interval {
     //    def pitchClass = PitchClass.valueStream.dropWhile(_ != from.pitchClass)(number - 1)
     var pitchClass = from.toPitchNumber + IntervalQuality.toPitchNumber(quality)
     var octave = from.octave
+    pitchClass -= 12 * octave
     while (pitchClass > 11) {
       pitchClass -= 12
       octave += 1
