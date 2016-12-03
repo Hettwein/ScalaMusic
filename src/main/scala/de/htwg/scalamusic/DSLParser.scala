@@ -34,7 +34,7 @@ package object parser {
       }
 
     def tuplet: Parser[Tuplet] = opt("(") ~> (rep1(note | chordName) <~ opt(")")) ~ """([\d])""".r ^^ {
-      case m ~ d => Tuplet(d.toInt, m)//n.map { m => m.asInstanceOf[Note].copy(duration = Beat(1, m.duration.denominator / 2 * d.toInt)) }
+      case m ~ d => Tuplet(d.toInt, m)
     }
 
     def rest: Parser[Rest] = """([r,R])""".r ~ """([\d])""".r ^^ {
@@ -49,9 +49,9 @@ package object parser {
       case p ~ q ~ ":" ~ d ~ Some(a) => Chord(p, q, if (a == ".") Beat(3, 2 * d.toInt) else Beat(1, d.toInt), a == "~")
     }
 
-//    def chord: Parser[Chord] = "<" ~ rep1(pitch) ~ ">" ~ """([\d]?)""".r ~ opt(noteAdditional) ^^ {
-//      case "<" ~ p ~ ">" ~ d ~ Some(a) => Chord(p, if (a == ".") Beat(3, 2 * d.toInt) else Beat(1, d.toInt), 70)
-//    }
+    //    def chord: Parser[Chord] = "<" ~ rep1(pitch) ~ ">" ~ """([\d]?)""".r ~ opt(noteAdditional) ^^ {
+    //      case "<" ~ p ~ ">" ~ d ~ Some(a) => Chord(p, if (a == ".") Beat(3, 2 * d.toInt) else Beat(1, d.toInt), 70)
+    //    }
 
     def tempo: Parser[Int] = "tempo" ~> """([\d]*)""".r ^^ {
       case t => t.toInt
@@ -121,11 +121,27 @@ package object parser {
     def m(args: Any*) = DSLParser(sc.parts(0)).asDSL
     def show(args: Any*) = ShowAsLy(DSLParser(sc.parts(0)))
     def ly(args: Any*) = ShowAsLy.generateLy(DSLParser(sc.parts(0)))
-    def generate(args: Any*) = new BassGenerator(DSLParser(sc.parts(0))).generate()
+    def generate(args: Any*) = { new BassGenerator(DSLParser(sc.parts(0))).generate("") }
   }
 
   object DSLGenerator {
     def apply(m: MusicConversion): String = m.asDSL
+  }
+
+  object BassGenerator {
+    def apply(style: String = "", m: String) = {
+      import java.io._
+      import sys.process._
+
+      println("asdf")
+      println(new BassGenerator(DSLParser(m)).generate(style))
+//      val fileName = s"\\rc-${System.currentTimeMillis()}" //////
+//      val bw = new BufferedWriter(new FileWriter(fileName + ".ly"))
+//      bw.write(new BassGenerator(DSLParser(m)).generate(style))
+//      bw.close()
+//
+//      val resultLy = Process("lilypond --pdf " + fileName + ".ly", new File("\\")).!!
+    }
   }
 
   object ShowAsLy {

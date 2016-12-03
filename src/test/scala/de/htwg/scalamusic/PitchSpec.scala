@@ -8,7 +8,8 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class PitchSpec extends WordSpec with Matchers {
-
+  import parser._
+  
   "Pitches" should {
     "be easy to create from the REPL" in {
       val p1 = Pitch(60)

@@ -23,7 +23,7 @@ object Interval {
     }
     while (pitchClass < 0) {
       pitchClass += 12
-      octave += 1//?
+      octave -= 1 //?
     }
 
     if (PitchClass.isIn(pitchClass)) {
@@ -52,8 +52,8 @@ object IntervalQuality extends Enumeration {
     MajorSixth -> 9,
     MinorSeventh -> 10,
     MajorSeventh -> 11,
-    Octave -> 11,
-    Ninth -> 13
+    Octave -> 12,
+    Ninth -> 14
   )
   def toPitchNumber(quality: IntervalQuality.Value): Int = midi(quality)
 }

@@ -33,11 +33,11 @@ class ChordSpec extends WordSpec with Matchers {
       ChordQuality("M") should be(ChordQuality.Major)
     }
     "have a DSL representation" in {
-    	Chord().asDSL should be("< c e g >1")
-    	Chord(Pitch("es")).asDSL should be("< ees g bes >1")
-    	Chord(Pitch("f"), ChordQuality.Minor, Beat(1, 2)).asDSL should be("< f aes c' >2")
-    	Chord(Pitch("a"), ChordQuality.Minor, Beat(1, 8), true).asDSL should be("< a c' e' >8~")
-    	Chord(Pitch("d"), ChordQuality.Minor, Beat(3, 4)).asDSL should be("< d f a >2.")
+    	Chord().asDSL should be("cM:1")
+    	Chord(Pitch("es")).asDSL should be("eesM:1")
+    	Chord(Pitch("f"), ChordQuality.Minor, Beat(1, 2)).asDSL should be("fm:2")
+    	Chord(Pitch("a"), ChordQuality.Minor, Beat(1, 8), true).asDSL should be("am:8~")
+    	Chord(Pitch("d"), ChordQuality.Minor, Beat(3, 4)).asDSL should be("dm:2.")
     }
     "have a LilyPond representation" in {
       Chord().asLy should be("< c e g >1")

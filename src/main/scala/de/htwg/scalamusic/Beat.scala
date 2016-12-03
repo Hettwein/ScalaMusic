@@ -7,7 +7,7 @@ case class Beat(numerator: Int = 1, denominator: Int = 4) extends MusicConversio
     val n = d / denominator * numerator + d / b.denominator * b.numerator
     Beat(n / gcd(d, n), d / gcd(d, n))
   }
-  
+
   def mul(b: Beat): Beat = {
     val n = numerator * b.numerator
     val d = denominator * b.denominator
@@ -16,4 +16,6 @@ case class Beat(numerator: Int = 1, denominator: Int = 4) extends MusicConversio
 
   def gcd(a: Int, b: Int): Int = if (b == 0) a.abs else gcd(b, a % b)
   def lcm(a: Int, b: Int) = (a * b).abs / gcd(a, b)
+
+  def getValue(): Double = numerator.toDouble / denominator.toDouble
 }
