@@ -11,7 +11,7 @@ case class Chord(root: Pitch = Pitch(), quality: ChordQuality.Value = ChordQuali
     case ChordQuality.Minor =>
       val scale = new MinorScale(root); Seq(root, scale.getDegreePitch(ScaleDegree.III), scale.getDegreePitch(ScaleDegree.V))
     case ChordQuality.Seventh => ///////////////////////////////
-//      val scale = new MajorScale(root); Seq(root, scale.getDegreePitch(ScaleDegree.III), scale.getDegreePitch(ScaleDegree.V), scale.getDegreePitch(ScaleDegree.VII).chromaticDown(scale.getSpelling))
+      //      val scale = new MajorScale(root); Seq(root, scale.getDegreePitch(ScaleDegree.III), scale.getDegreePitch(ScaleDegree.V), scale.getDegreePitch(ScaleDegree.VII).chromaticDown(scale.getSpelling))
       val scale = new MajorScale(new MajorScale(root).getDegreePitch(ScaleDegree.IV)); Seq(root, scale.getDegreePitch(ScaleDegree.VII)-, scale.getDegreePitch(ScaleDegree.II), scale.getDegreePitch(ScaleDegree.IV))
     case ChordQuality.MajorSeventh =>
       val scale = new MajorScale(root); Seq(root, scale.getDegreePitch(ScaleDegree.III), scale.getDegreePitch(ScaleDegree.V), scale.getDegreePitch(ScaleDegree.VII))

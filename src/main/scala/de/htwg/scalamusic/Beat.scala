@@ -18,15 +18,15 @@ case class Beat(numerator: Int = 1, denominator: Int = 4) extends MusicConversio
   def lcm(a: Int, b: Int) = (a * b).abs / gcd(a, b)
 
   def getValue(): Double = numerator.toDouble / denominator.toDouble
-  
-//  def getRandom(min: Beat, max: Beat): Beat = {
-////    (Math.random() * 1 + time.denominator).floor.toInt
-////    val rand = Math.random() * max.getValue() + min.getValue()
-//    val rDenom = (Math.random() * min.denominator + max.denominator).floor.toInt
-//    val bl = Map(
-//        0 -> min,
-//        1 -> min.sum(min.mul(Beat(1, 2))),
-//        2 -> ???)
-//        
-//  }
+
+  //  def getRandom(min: Beat, max: Beat): Beat = {
+  ////    (Math.random() * 1 + time.denominator).floor.toInt
+  ////    val rand = Math.random() * max.getValue() + min.getValue()
+  //    val rDenom = (Math.random() * min.denominator + max.denominator).floor.toInt
+  //    val bl = Map(
+  //        0 -> min,
+  //        1 -> min.sum(min.mul(Beat(1, 2))),
+  //        2 -> ???)
+  //        
+  //  }
 }

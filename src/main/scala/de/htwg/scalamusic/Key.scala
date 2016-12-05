@@ -28,14 +28,12 @@ trait Mode extends MusicConversion with HasKeySignatureSpelling {
     scale(3) -> ScaleDegree.IV,
     scale(4) -> ScaleDegree.V,
     scale(5) -> ScaleDegree.VI,
-    scale(6) -> ScaleDegree.VII)
+    scale(6) -> ScaleDegree.VII
+  )
 
-//  def inKey(p: Pitch): ScaleDegree.Value = degree.getOrElse(p, degree(Interval.getPitch(p, IntervalQuality.MajorSecond, getSpelling))) ///////
-  def getDegreeIndex(p: Pitch): Int = { val idx = scale.indexOf(p); if(idx != -1) idx else if (getSpelling == KeySignatureSpelling.Flats) scale.indexOf(p.chromaticUp(getSpelling)) else scale.indexOf(p.chromaticDown(getSpelling)) }
+  def getDegreeIndex(p: Pitch): Int = { val idx = scale.indexOf(p); if (idx != -1) idx else if (getSpelling == KeySignatureSpelling.Flats) scale.indexOf(p.chromaticUp(getSpelling)) else scale.indexOf(p.chromaticDown(getSpelling)) }
   def stepUp(from: Pitch): Pitch = { val idx = scale.indexOf(from); if (idx < 6) scale(idx + 1) else scale(idx - 6)+ }
-  //inKey(from).id//{val d = degree.map(_.swap).get(inKey(from)).get; if(d < 7) getDegreePitch(degree(d + 1)) else getDegreePitch(degree(d - 6))+}
   def stepDown(from: Pitch): Pitch = { val idx = scale.indexOf(from); if (idx > 0) scale(idx - 1) else scale(idx + 6)- }
-  //val d = degree.map(_.swap).get(inKey(from)).get; if(d > 1) getDegreePitch(degree(d - 1)) else getDegreePitch(degree(d + 6))-}
 }
 
 case class MajorScale(root: Pitch) extends Mode {

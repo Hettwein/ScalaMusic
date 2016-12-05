@@ -1,6 +1,7 @@
 package de.htwg.scalamusic
 
 import scala.util.parsing.combinator.RegexParsers
+import scala.io.Source
 
 package object parser {
 
@@ -33,13 +34,13 @@ package object parser {
             o.getOrElse(0)), if (a == ".") Beat(3, 2 * b.toInt) else Beat(1, b.toInt), a == "~")
       }
 
-//    def tiedNote: Parser[Note] = note ~ rep1("~" ~ note) ^^ {
-//      case n ~ tn => {
-//         val notes = tn.map(_._2)
-//         val sum = notes.foldLeft(Beat(0, 1))((n, m) => n.sum(m.duration))
-//        n.copy(duration = n.duration.sum(sum), tied = true)
-//      }
-//    }
+    //    def tiedNote: Parser[Note] = note ~ rep1("~" ~ note) ^^ {
+    //      case n ~ tn => {
+    //         val notes = tn.map(_._2)
+    //         val sum = notes.foldLeft(Beat(0, 1))((n, m) => n.sum(m.duration))
+    //        n.copy(duration = n.duration.sum(sum), tied = true)
+    //      }
+    //    }
 
     def tuplet: Parser[Tuplet] = opt("(") ~> (rep1(note | chordName) <~ opt(")")) ~ """([\d])""".r ^^ {
       case m ~ d => Tuplet(d.toInt, m)
@@ -129,7 +130,7 @@ package object parser {
     def m(args: Any*) = DSLParser(sc.parts(0)).asDSL
     def show(args: Any*) = ShowAsLy(DSLParser(sc.parts(0)))
     def ly(args: Any*) = ShowAsLy.generateLy(DSLParser(sc.parts(0)))
-    def generate(args: Any*) = { new BassGenerator(DSLParser(sc.parts(0))).generate("") }
+    def generate(args: Any*) = { new BassGenerator(DSLParser(sc.parts(0))).generate(Style("")) }
   }
 
   object DSLGenerator {
@@ -141,14 +142,7 @@ package object parser {
       import java.io._
       import sys.process._
 
-//      println("asdf")
-//      println(new BassGenerator(DSLParser(m)).generate(style))
-            val fileName = s"\\rc-${System.currentTimeMillis()}" //////
-            val bw = new BufferedWriter(new FileWriter(fileName + ".ly"))
-            bw.write(new BassGenerator(DSLParser(m)).generate(style))
-            bw.close()
-      
-            val resultLy = Process("lilypond --pdf " + fileName + ".ly", new File("\\")).!!
+      ShowAsLy(new BassGenerator(DSLParser(m)).generate(Style(style)))
     }
   }
 
@@ -158,14 +152,15 @@ package object parser {
       import java.io._
       import sys.process._
 
-      val fileName = s"\\rc-${System.currentTimeMillis()}"
-      val bw = new BufferedWriter(new FileWriter(fileName + ".ly"))
+      val path = new File(getClass.getResource("").getPath).getParentFile.getParentFile.getParentFile.getParentFile.getParent + "/lilypond-output"
+      val fileName = s"rc-${System.currentTimeMillis()}"
+      val bw = new BufferedWriter(new FileWriter(path + "/" + fileName + ".ly"))
       bw.write(generateLy(m))
       bw.close()
 
-      val resultLy = Process("lilypond --pdf " + fileName + ".ly", new File("\\")).!!
-      //      println(resultLy)
-      //      s"open ${fileName}.pdf".!
+      val resultLy = Process("lilypond --pdf " + fileName + ".ly", new File(path)).!!
+//      println(resultLy)
+//      s"open ${fileName}.pdf".!
     }
 
     def generateLy(m: MusicConversion): String = {

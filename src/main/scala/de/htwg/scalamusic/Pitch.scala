@@ -10,10 +10,10 @@ case class Pitch(pitchClass: PitchClass.Value = PitchClass.C, decorator: PitchDe
 
   def + = copy(octave = octave + 1)
   def - = copy(octave = octave - 1)
-  
+
   def chromaticUp(sign: KeySignatureSpelling.Value) = Interval.getPitch(this, IntervalQuality.MinorSecond, sign)
   def chromaticDown(sign: KeySignatureSpelling.Value) = Interval.getPitch(this, IntervalQuality.MajorSeventh, sign)-
-    
+
   override def toString: String = {
     var octaves = "";
     if (octave >= 0) {

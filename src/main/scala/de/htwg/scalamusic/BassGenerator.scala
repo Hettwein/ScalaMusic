@@ -4,79 +4,66 @@ import scala.language.postfixOps
 
 class BassGenerator(val score: Score) {
 
-  def generate(style: String): String = {
-    val chords = extractChords()
-    var bassline: List[Measure] = List()
-    var t = chords.music(0).timeSignature
-    var k = chords.music(0).key
+  def generate(style: Style.Value): Score = {
+    val chords = extractChords().music
+    var t = chords(0).timeSignature
+    var k = chords(0).key
 
-    //    val followMap = (chords.music.flatMap { x => x.music }, chords.music.tail.flatMap { x => x.music }).zipped.toMap//.foreach((x, y) => println(x.asLy + " " + y.asLy))
-
-    //    chords.music.foreach { bar => // iterate over measures
-    for (x <- 0 until chords.music.size) { // iterate over measures
-      val bar = chords.music(x)
+    val bassline = for (x1 <- 0 until chords.size) yield { // iterate over measures
+      val bar = chords(x1)
+      val x2 = x1 + 1
       if (bar.keyChange) k = bar.key
       if (bar.timeChange) t = bar.timeSignature
-      var measure = Measure(timeSignature = t, key = k, clef = Clef.bass, timeChange = bar.timeChange, clefChange = (bar == chords.music(0)), keyChange = bar.keyChange)
-      var music: List[MusicElement] = List()
 
-      //      bar.music.foreach { x => // iterate over chords
-      for (y <- 0 until bar.music.size) { // iterate over chords
-        val chord = bar.music(y).asInstanceOf[Chord]
-        val follow = (if (y + 1 < bar.music.size) bar.music(y + 1) else if (x + 1 < chords.music.size) chords.music(x + 1).music(0) else null).asInstanceOf[Chord]
-        //        val follow = followMap.get(chord)
-        //        println(follow.get.asLy)
+      val music: Seq[MusicElement] = for (y1 <- 0 until bar.music.size; y2 <- 1 to bar.music.size) yield { // iterate over chords
+        val chord = bar.music(y1).asInstanceOf[Chord]
+        val follow = (if (y2 < bar.music.size) bar.music(y2) else if (x2 < chords.size) chords(x2).music(0) else null).asInstanceOf[Chord]
+        //        generatePattern(style, chord, follow, k, t)
         val pattern = generatePattern(style, chord, follow, k, t)
 
-        val d = pattern.duration
-        var i = 0
-        while (d.mul(Beat(i, 1)).getValue < chord.duration.getValue) {
-          music = music :+ (if (pattern.duration.getValue > chord.duration.getValue) Pattern(pattern.elements.take(pattern.elements.size / 2)) else pattern)
-          i += 1
-        }
-
+        Pattern(for (i <- Seq.range(0, 10 /**/ ); if (pattern.duration.mul(Beat(i, 1)).getValue < chord.duration.getValue)) yield { // evtl nicht mehr nötig
+          if (pattern.duration.getValue > chord.duration.getValue) Pattern(pattern.elements.take(pattern.elements.size / 2)) else pattern
+        })
       }
-      bassline = bassline :+ measure.copy(music = music)
+      Measure(timeSignature = t, key = k, clef = Clef.bass, timeChange = bar.timeChange, clefChange = (bar == chords(0)), keyChange = bar.keyChange, music = music)
     }
-    val newScore = score.copy(music = Seq(Staff(score.music(0).music :+ new Voice(bassline, "electric bass (pick)"))))
-    newScore.asLy + "\n"
+    score.copy(music = Seq(Staff(score.music(0).music :+ new Voice(bassline, "electric bass (pick)"))))
   }
 
-  def generatePattern(style: String, chord: Chord, follow: Chord, key: Mode, time: TimeSignature): Pattern = {
+  def generatePattern(style: Style.Value, chord: Chord, follow: Chord, key: Mode, time: TimeSignature): Pattern = {
 
-    //    println(if (follow != null) follow.asLy)
     val chordalNotes = chord.music
     val passingNotes = chord.music // needs following chord
 
     style match {
-      case "8Beat" =>
-        val note1 = new Note(chord.root-, new Beat(1, time.denominator * 2));
-        val note2 = new Note(Interval.getPitch(chord.root, IntervalQuality.Fifth, key.getSpelling)-, new Beat(1, time.denominator * 2));
+      case Style.beat =>
+        val note1 = new Note(chord.root-, new Beat(1, time.denominator * 2))
+        val note2 = new Note(Interval.getPitch(chord.root, IntervalQuality.Fifth, key.getSpelling)-, new Beat(1, time.denominator * 2))
         Pattern(Seq(note1, note2))
-      case "Blues" =>
-        val note1 = new Note(chord.root-, new Beat(1, time.denominator * 2));
-        val rest = new Rest(new Beat(1, time.denominator * 2));
-        val note2 = new Note(Interval.getPitch(chord.root, IntervalQuality.Fifth, key.getSpelling)-, new Beat(1, time.denominator * 2));
+      case Style.blues =>
+        val note1 = new Note(chord.root-, new Beat(1, time.denominator * 2))
+        val rest = new Rest(new Beat(1, time.denominator * 2))
+        val note2 = new Note(Interval.getPitch(chord.root, IntervalQuality.Fifth, key.getSpelling)-, new Beat(1, time.denominator * 2))
         Pattern(Seq(Tuplet(3, Seq(note1, rest, note2))))
-      case "Blues2" =>
-        val note1 = new Note(chord.root-, new Beat(1, time.denominator * 2));
-        val rest = new Rest(new Beat(1, time.denominator * 2));
-        val note2 = new Note(Interval.getPitch(chord.root, IntervalQuality.MajorThird, key.getSpelling)-, new Beat(1, time.denominator * 2));
-        val note3 = new Note(Interval.getPitch(chord.root, IntervalQuality.Fifth, key.getSpelling)-, new Beat(1, time.denominator * 2));
-        val note4 = new Note(Interval.getPitch(chord.root, IntervalQuality.MajorSixth, key.getSpelling)-, new Beat(1, time.denominator * 2));
-        val note5 = new Note(Interval.getPitch(chord.root, IntervalQuality.Octave, key.getSpelling)-, new Beat(1, time.denominator * 2));
+      case Style.blues2 =>
+        val note1 = new Note(chord.root-, new Beat(1, time.denominator * 2))
+        val rest = new Rest(new Beat(1, time.denominator * 2))
+        val note2 = new Note(Interval.getPitch(chord.root, IntervalQuality.MajorThird, key.getSpelling)-, new Beat(1, time.denominator * 2))
+        val note3 = new Note(Interval.getPitch(chord.root, IntervalQuality.Fifth, key.getSpelling)-, new Beat(1, time.denominator * 2))
+        val note4 = new Note(Interval.getPitch(chord.root, IntervalQuality.MajorSixth, key.getSpelling)-, new Beat(1, time.denominator * 2))
+        val note5 = new Note(Interval.getPitch(chord.root, IntervalQuality.Octave, key.getSpelling)-, new Beat(1, time.denominator * 2))
         Pattern(Seq(Tuplet(3, Seq(note1, rest, note1)), Tuplet(3, Seq(note2, rest, note2)), Tuplet(3, Seq(note3, rest, note3)), Tuplet(3, Seq(note4, rest, note5))))
-      case "follow" =>
+      //        Pattern(fill(chord, time, Pattern(Seq(Tuplet(3, Seq(note1, rest, note1)), Tuplet(3, Seq(note2, rest, note2)), Tuplet(3, Seq(note3, rest, note3)), Tuplet(3, Seq(note4, rest, note5))))))
+      case Style.follow =>
         if (follow != null) {
           val note1 = new Note(chord.root-, new Beat(3, chord.duration.denominator * 4))
           val note2 = new Note(key.stepDown(follow.root)-, new Beat(1, chord.duration.denominator * 4))
           Pattern(Seq(note1, note2))
         } else {
-          val note = new Note(chord.root-, new Beat(1, chord.duration.denominator));
+          val note = new Note(chord.root-, new Beat(1, chord.duration.denominator))
           Pattern(Seq(note))
         }
-      case "random" =>
-        //        val rand = (Math.random() * (chordalNotes.size - 0.4) + time.denominator).floor.toInt
+      case Style.random =>
         val note = Note(chord.root-, new Beat(1, time.denominator))
         var p = Seq(note)
         var d = note.duration.getValue()
@@ -88,13 +75,12 @@ class BassGenerator(val score: Score) {
           d += n.duration.getValue()
         }
         Pattern(p)
-      case "randomTriplets" =>
-        //        val rand = (Math.random() * (chordalNotes.size - 0.4) + time.denominator).floor.toInt
+      case Style.randomTriplets =>
         val note = Note(chord.root-, new Beat(1, time.denominator))
         var p: Seq[MusicElement] = Seq(note)
         var d = note.duration.getValue()
         while (d < chord.duration.getValue()) {
-          val diff = chord.duration.getValue() - d
+          //          val diff = chord.duration.getValue() - d
 
           val r1 = (Math.random() * (chordalNotes.size - 0.5)).floor.toInt
           val r2 = (Math.random() * (chordalNotes.size - 0.5)).floor.toInt
@@ -103,7 +89,7 @@ class BassGenerator(val score: Score) {
           val note1 = Note(chordalNotes(r1)-, new Beat(1, time.denominator * 2))
           val note2 = Note(chordalNotes(r2)-, new Beat(1, time.denominator * 2))
           val note3 = Note(chordalNotes(r3)-, new Beat(1, time.denominator * 2))
-          val t = Tuplet(3, Seq(if(Math.random() > 0.1) note1 else rest, if(Math.random() > 0.6) note2 else rest, if(Math.random() > 0.2) note3 else rest))
+          val t = Tuplet(3, Seq(if (Math.random() > 0.1) note1 else rest, if (Math.random() > 0.6) note2 else rest, if (Math.random() > 0.2) note3 else rest))
           p = p :+ t
           d += t.duration.getValue()
         }
@@ -114,9 +100,25 @@ class BassGenerator(val score: Score) {
     }
   }
 
+  //  def fill(chord: Chord, time: TimeSignature, pattern: Pattern): Seq[MusicElement] = {
+  //    var d = 0.0
+  //    for (i <- 0 until pattern.elements.size; if (d < chord.duration.getValue())) yield {
+  ////      val diff = chord.duration.getValue() - d
+  //      d += pattern.elements(i).duration.getValue()
+  //      pattern.elements(i)
+  //    }
+  //  }
+
   def extractChords(): ChordProgression = {
     score.music.foreach { x => x.music.foreach { m => if (m.isInstanceOf[ChordProgression]) { return m.asInstanceOf[ChordProgression] } } }
     ChordProgression()
   }
 
+}
+
+object Style extends Enumeration {
+  type Style = Value
+  val blues, blues2, random, randomTriplets, beat, follow = Value // look for proper styles
+
+  def apply(s: String): Style = withName(s)
 }
