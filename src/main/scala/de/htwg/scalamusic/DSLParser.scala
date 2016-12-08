@@ -89,7 +89,7 @@ package object parser {
       case Some(i) ~ m => new Voice(m, i)
     }
 
-    def instrument: Parser[String] = "instr" ~> (opt("\'") ~> """([a-z,A-Z,0-9, ]*)""".r) <~ opt("\'") ^^ {
+    def instrument: Parser[String] = "instr" ~> (opt("\'") ~> """([a-z,A-Z,0-9,(,), ]*)""".r) <~ opt("\'") ^^ {
       case i => i
     }
 
@@ -160,7 +160,8 @@ package object parser {
 
       val resultLy = Process("lilypond --pdf " + fileName + ".ly", new File(path)).!!
 //      println(resultLy)
-//      s"open ${fileName}.pdf".!
+//      Process(fileName + ".mid", new File(path)).!!
+//      Process(fileName + ".pdf", new File(path)).!!
     }
 
     def generateLy(m: MusicConversion): String = {
