@@ -17,6 +17,7 @@ class BassGenerator(val score: Score) {
 
       val music: Seq[MusicElement] = for (y1 <- 0 until bar.music.size; y2 <- 1 to bar.music.size) yield { // iterate over chords
         val chord = bar.music(y1).asInstanceOf[Chord]
+//        val chord = if(bar.music(y1).isInstanceOf[Chord]) bar.music(y1).asInstanceOf[Chord] else bar.music(y1).asInstanceOf[Rest]
         val follow = (if (y2 < bar.music.size) bar.music(y2) else if (x2 < chords.size) chords(x2).music(0) else null).asInstanceOf[Chord]
         //        generatePattern(style, chord, follow, k, t)
         val pattern = generatePattern(style, chord, follow, k, t)
@@ -27,7 +28,7 @@ class BassGenerator(val score: Score) {
       }
       Measure(timeSignature = t, key = k, clef = Clef.bass, timeChange = bar.timeChange, clefChange = (bar == chords(0)), keyChange = bar.keyChange, music = music)
     }
-    score.copy(music = Seq(Staff(score.music(0).music :+ new Voice(bassline, "electric bass (pick)"))))
+    score.copy(music = Seq(Staff(score.music(0).music :+ new Voice(bassline, "electric bass (finger)"))))
   }
 
   def generatePattern(style: Style.Value, chord: Chord, follow: Chord, key: Mode, time: TimeSignature): Pattern = {
@@ -36,6 +37,17 @@ class BassGenerator(val score: Score) {
     val passingNotes = chord.music // needs following chord
 
     style match {
+      case Style.jazz =>
+        val note = new Note(chord.root-, new Beat(1, 4))
+        Pattern(Seq(note))
+      case Style.rock =>
+        val note = new Note(chord.root-, new Beat(1, 8))
+        Pattern(Seq(note))
+      case Style.funk =>
+        val note1 = new Note(chord.root-, new Beat(1, 4))
+        val note2 = new Note(chord.root, new Beat(1, 4))
+        Pattern(Seq(note1, note2))
+        
       case Style.beat =>
         val note1 = new Note(chord.root-, new Beat(1, time.denominator * 2))
         val note2 = new Note(Interval.getPitch(chord.root, IntervalQuality.Fifth, key.getSpelling)-, new Beat(1, time.denominator * 2))
@@ -118,7 +130,7 @@ class BassGenerator(val score: Score) {
 
 object Style extends Enumeration {
   type Style = Value
-  val blues, blues2, random, randomTriplets, beat, follow = Value // look for proper styles
+  val jazz, rock, funk, pop, blues, blues2, random, randomTriplets, beat, follow = Value // look for proper styles
 
   def apply(s: String): Style = withName(s)
 }
