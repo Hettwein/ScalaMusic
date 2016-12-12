@@ -4,7 +4,8 @@ import scala.language.postfixOps
 
 class BassGenerator(val score: Score) {
 
-  def generate(style: Style.Value): Score = {
+  def generate(): Score = {
+    val style = score.style
     val chords = extractChords().music
     var t = chords(0).timeSignature
     var k = chords(0).key
@@ -126,11 +127,4 @@ class BassGenerator(val score: Score) {
     ChordProgression()
   }
 
-}
-
-object Style extends Enumeration {
-  type Style = Value
-  val jazz, rock, funk, pop, blues, blues2, random, randomTriplets, beat, follow = Value // look for proper styles
-
-  def apply(s: String): Style = withName(s)
 }

@@ -134,8 +134,13 @@ package object parser {
       case d ~ "/" ~ n => TimeSignature(d.toInt, n.toInt)
     }
 
-    def score: Parser[Score] = opt("(") ~> rep1(staff) <~ opt(")") ^^ {
-      case m => Score(music = m)
+    
+    def style: Parser[String] = "style" ~> (opt("\'") ~> """([a-z,A-Z,0-9,(,), ]*)""".r) <~ opt("\'") ^^ {
+      case s => s
+    }
+    
+    def score: Parser[Score] = opt("(") ~> style ~ rep1(staff) <~ opt(")") ^^ {
+      case s ~ m => Score(Style(s), m)
     }
 
     def apply(input: String): Score = parseAll(score, input) match {
@@ -149,20 +154,11 @@ package object parser {
     def m(args: Any*) = DSLParser(sc.parts(0)).asDSL
     def show(args: Any*) = ShowAsLy(DSLParser(sc.parts(0)))
     def ly(args: Any*) = ShowAsLy.generateLy(DSLParser(sc.parts(0)))
-    def generate(args: Any*) = { new BassGenerator(DSLParser(sc.parts(0))).generate(Style("")) }
+    def generate(args: Any*) = { ShowAsLy(new BassGenerator(DSLParser(sc.parts(0))).generate) }
   }
 
   object DSLGenerator {
     def apply(m: MusicConversion): String = m.asDSL
-  }
-
-  object BassGenerator {
-    def apply(style: String = "", m: String) = {
-      import java.io._
-      import sys.process._
-
-      ShowAsLy(new BassGenerator(DSLParser(m)).generate(Style(style)))
-    }
   }
 
   object ShowAsLy {
