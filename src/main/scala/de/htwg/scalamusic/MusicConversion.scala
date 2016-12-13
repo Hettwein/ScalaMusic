@@ -9,3 +9,5 @@ trait MusicConversion {
   def asLy: String = this.toString().toLowerCase() //name + duration + attribute + " "
   def asDSL: String = this.toString().toLowerCase()
 }
+
+trait MusicSegment extends MusicConversion

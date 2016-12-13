@@ -6,7 +6,8 @@ class BassGenerator(val score: Score) {
 
   def generate(): Score = {
     val style = score.style
-    val chords = extractChords().music
+    val chords = extractChords().measures
+
     var t = chords(0).timeSignature
     var k = chords(0).key
 
@@ -106,7 +107,7 @@ class BassGenerator(val score: Score) {
   def fill(chord: Chord, time: TimeSignature, pattern: Seq[MusicElement]): Seq[MusicElement] = {
     val duration: Beat = pattern.foldLeft(Beat(0, 1))((n, m) => n.sum(m.duration))
     var d = 0.0
-    for (i <- 0 until (chord.duration.getValue / duration.getValue).toInt; if (d < chord.duration.getValue())) yield {
+    for (i <- 0 until (chord.duration.getValue / duration.getValue * 2).toInt; if (d < chord.duration.getValue())) yield {
       d += pattern(i % pattern.size).duration.getValue()
       pattern(i % pattern.size)
     }

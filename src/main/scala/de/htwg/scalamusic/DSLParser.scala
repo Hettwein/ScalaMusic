@@ -65,7 +65,7 @@ package object parser {
     def tempo: Parser[Int] = "tempo" ~> """([\d]*)""".r ^^ {
       case t => t.toInt
     }
-    
+
     def partial: Parser[Int] = "partial" ~> """([\d]*)""".r ^^ {
       case p => p.toInt
     }
@@ -103,27 +103,31 @@ package object parser {
       case None ~ None ~ None ~ Some(s) ~ Some(p) ~ m => Measure(tempo = s.toInt, music = m.flatten, tempoChange = true, partial = p)
     }
 
-    def measures: Parser[Seq[Measure]] = rep1(measure) ^^ {
-      case m => m
+//    def measures: Parser[Seq[Measure]] = rep1(measure) ^^ {
+//      case m => m
+//    }
+
+    //    def repetition: Parser[Seq[Measure]] = "|:" ~> rep1(measures | repetition) ~ opt(rep1("[" ~> measures <~ "]"))<~ ":|" ^^ {
+    //      case m ~ None => (m++m).flatten
+    //      case m ~ Some(a) => (for(i <- 0 until a.size) yield m.flatten++a(i)).flatten
+    //    }
+    def repetition: Parser[Repetition] = "|:" ~> rep1(measure) ~ opt(rep1("[" ~> rep1(measure) <~ "]")) <~ ":|" ^^ {
+      case m ~ None => new Repetition(m)
+      case m ~ Some(a) => new Repetition(m, a)
     }
-    
-    def repetition: Parser[Seq[Measure]] = "|:" ~> rep1(measures | repetition) ~ opt(rep1("[" ~> measures <~ "]"))<~ ":|" ^^ {
-      case m ~ None => (m++m).flatten
-      case m ~ Some(a) => (for(i <- 0 until a.size) yield m.flatten++a(i)).flatten
-    }
-    
-    def voice: Parser[Voice] = opt("(") ~> opt(instrument) ~ rep1(measures | repetition) <~ opt(")") ^^ {
-      case None ~ m => new Voice(music = m.flatten)
-      case Some(i) ~ m => new Voice(m.flatten, i)
+
+    def voice: Parser[Voice] = opt("(") ~> opt(instrument) ~ rep1(measure | repetition) <~ opt(")") ^^ {
+      case None ~ m => new Voice(music = m)
+      case Some(i) ~ m => new Voice(m, i)
     }
 
     def instrument: Parser[String] = "instr" ~> (opt("\'") ~> """([a-z,A-Z,0-9,(,), ]*)""".r) <~ opt("\'") ^^ {
       case i => i
     }
 
-    def chords: Parser[ChordProgression] = opt("chords(") ~> opt(instrument) ~ rep1(measures | repetition) <~ opt(")") ^^ {
-      case None ~ m => ChordProgression(music = m.flatten)
-      case Some(i) ~ m => ChordProgression(m.flatten, i)
+    def chords: Parser[ChordProgression] = opt("chords(") ~> opt(instrument) ~ rep1(measure | repetition) <~ opt(")") ^^ {
+      case None ~ m => ChordProgression(music = m)
+      case Some(i) ~ m => ChordProgression(m, i)
     }
 
     def key: Parser[Mode] = "key" ~> pitch ~ opt("""([m])""".r) ^^ {
@@ -143,11 +147,10 @@ package object parser {
       case d ~ "/" ~ n => TimeSignature(d.toInt, n.toInt)
     }
 
-    
     def style: Parser[String] = "style" ~> (opt("\'") ~> """([a-z,A-Z,0-9,(,), ]*)""".r) <~ opt("\'") ^^ {
       case s => s
     }
-    
+
     def score: Parser[Score] = opt("(") ~> style ~ rep1(staff) <~ opt(")") ^^ {
       case s ~ m => Score(Style(s), m)
     }
@@ -183,9 +186,9 @@ package object parser {
       bw.close()
 
       val resultLy = Process("lilypond --pdf " + fileName + ".ly", new File(path)).!!
-//      println(resultLy)
-//      Process(fileName + ".mid", new File(path)).!!
-//      Process(fileName + ".pdf", new File(path)).!!
+      //      println(resultLy)
+      //      Process(fileName + ".mid", new File(path)).!!
+      //      Process(fileName + ".pdf", new File(path)).!!
     }
 
     def generateLy(m: MusicConversion): String = {
