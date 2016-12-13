@@ -103,18 +103,27 @@ package object parser {
       case None ~ None ~ None ~ Some(s) ~ Some(p) ~ m => Measure(tempo = s.toInt, music = m.flatten, tempoChange = true, partial = p)
     }
 
-    def voice: Parser[Voice] = opt("(") ~> opt(instrument) ~ rep1(measure) <~ opt(")") ^^ {
-      case None ~ m => new Voice(music = m)
-      case Some(i) ~ m => new Voice(m, i)
+    def measures: Parser[Seq[Measure]] = rep1(measure) ^^ {
+      case m => m
+    }
+    
+    def repetition: Parser[Seq[Measure]] = "|:" ~> rep1(measures | repetition) ~ opt(rep1("[" ~> measures <~ "]"))<~ ":|" ^^ {
+      case m ~ None => (m++m).flatten
+      case m ~ Some(a) => (for(i <- 0 until a.size) yield m.flatten++a(i)).flatten
+    }
+    
+    def voice: Parser[Voice] = opt("(") ~> opt(instrument) ~ rep1(measures | repetition) <~ opt(")") ^^ {
+      case None ~ m => new Voice(music = m.flatten)
+      case Some(i) ~ m => new Voice(m.flatten, i)
     }
 
     def instrument: Parser[String] = "instr" ~> (opt("\'") ~> """([a-z,A-Z,0-9,(,), ]*)""".r) <~ opt("\'") ^^ {
       case i => i
     }
 
-    def chords: Parser[ChordProgression] = opt("chords(") ~> opt(instrument) ~ rep1(measure) <~ opt(")") ^^ {
-      case None ~ m => ChordProgression(music = m)
-      case Some(i) ~ m => ChordProgression(m, i)
+    def chords: Parser[ChordProgression] = opt("chords(") ~> opt(instrument) ~ rep1(measures | repetition) <~ opt(")") ^^ {
+      case None ~ m => ChordProgression(music = m.flatten)
+      case Some(i) ~ m => ChordProgression(m.flatten, i)
     }
 
     def key: Parser[Mode] = "key" ~> pitch ~ opt("""([m])""".r) ^^ {

@@ -15,12 +15,9 @@ class BassGenerator(val score: Score) {
       val x2 = x1 + 1
       if (bar.keyChange) k = bar.key
       if (bar.timeChange) t = bar.timeSignature
-
       val music: Seq[MusicElement] = (for (y1 <- 0 until bar.music.size; y2 <- 1 to bar.music.size) yield { // iterate over chords
-        
         val follow = (if (y2 < bar.music.size) bar.music(y2) else if (x2 < chords.size) chords(x2).music(0) else null).asInstanceOf[Chord]
         val chord = (if (bar.music(y1).isInstanceOf[Chord]) bar.music(y1) else Chord(root = k.getDegreePitch(ScaleDegree.V), duration = bar.music(y1).duration)).asInstanceOf[Chord]
-
         fill(chord, t, generatePattern(style, chord, follow, k, t))
       }).flatten
       Measure(timeSignature = t, key = k, clef = Clef.bass, timeChange = bar.timeChange, clefChange = (bar == chords(0)), keyChange = bar.keyChange, music = music)
@@ -62,7 +59,6 @@ class BassGenerator(val score: Score) {
         val note4 = new Note(Interval.getPitch(chord.root, IntervalQuality.MajorSixth, key.getSpelling)-, new Beat(1, time.denominator * 2))
         val note5 = new Note(Interval.getPitch(chord.root, IntervalQuality.Octave, key.getSpelling)-, new Beat(1, time.denominator * 2))
         Seq(Tuplet(3, Seq(note1, rest, note1)), Tuplet(3, Seq(note2, rest, note2)), Tuplet(3, Seq(note3, rest, note3)), Tuplet(3, Seq(note4, rest, note5)))
-      //        Pattern(fill(chord, time, Pattern(Seq(Tuplet(3, Seq(note1, rest, note1)), Tuplet(3, Seq(note2, rest, note2)), Tuplet(3, Seq(note3, rest, note3)), Tuplet(3, Seq(note4, rest, note5))))))
       case Style.follow =>
         if (follow != null) {
           val note1 = new Note(chord.root-, new Beat(3, chord.duration.denominator * 4))
@@ -89,8 +85,6 @@ class BassGenerator(val score: Score) {
         var p: Seq[MusicElement] = Seq(note)
         var d = note.duration.getValue()
         while (d < chord.duration.getValue()) {
-          //          val diff = chord.duration.getValue() - d
-
           val r1 = (Math.random() * (chordalNotes.size - 0.5)).floor.toInt
           val r2 = (Math.random() * (chordalNotes.size - 0.5)).floor.toInt
           val r3 = (Math.random() * (chordalNotes.size - 0.5)).floor.toInt
