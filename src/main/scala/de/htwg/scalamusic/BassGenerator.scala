@@ -5,42 +5,38 @@ import scala.language.postfixOps
 class BassGenerator(val score: Score) {
 
   def generate(): Score = {
-    val style = score.style
-    val chords = extractChords().measures
+//    val style = score.style
+//    val chords = extractChords().music
 
-    var t = chords(0).timeSignature
-    var k = chords(0).key
+//    var t = chords(0).timeSignature
+//    var k = chords(0).key
 
-    val bassline = for (i <- 0 until chords.size) yield { // iterate over measures
-      val bar = chords(i)
-      if (bar.keyChange) k = bar.key
-      if (bar.timeChange) t = bar.timeSignature
-      val music: Seq[MusicElement] = applyPattern(bar.music.asInstanceOf[Seq[Chord]], t, getPattern(style, i + 1))
-      Measure(timeSignature = t, key = k, clef = Clef.bass, timeChange = bar.timeChange, clefChange = (bar == chords(0)), keyChange = bar.keyChange, music = music)
-    }
+    val bassline = generate(score.style, extractChords().music, TimeSignature(), MajorScale(Pitch()))
     score.copy(music = Seq(Staff(score.music(0).music :+ new Voice(bassline, "electric bass (finger)"))))
   }
 
+  def generate(style: Style, segments: Seq[MusicSegment], time: TimeSignature, key: Key, n: Int = 0): Seq[MusicSegment] = {
+    for (i <- 0 until segments.size) yield { // iterate over measures
+      var k = key
+      var t = time
+      if (segments(i).isInstanceOf[Measure]) {
+        val bar = segments(i).asInstanceOf[Measure]
+        if (bar.keyChange) k = bar.key
+        if (bar.timeChange) t = bar.timeSignature
+        val music: Seq[MusicElement] = applyPattern(bar.music.asInstanceOf[Seq[Chord]], t, getPattern(style, if(n == 0) i + 1 else n))////
+        Measure(timeSignature = t, key = k, clef = Clef.bass, timeChange = bar.timeChange, clefChange = (bar == segments(0)), keyChange = bar.keyChange, music = music)
+      } else {
+        val rep = segments(i).asInstanceOf[Repeat]
+        Repeat(generate(style, rep.music, time, key), rep.alternatives.map { x => generate(style, x, time, key, 4).asInstanceOf[Seq[Measure]] })
+      }
+    }
+  }
+
   def getPattern(style: Style, count: Int): Seq[(ScaleDegree.Value, Beat)] = {
-    style match {
-      case Rock =>
-        if (count % 4 != 0) {
-          Rock.pattern(Math.random().round.toInt * (Rock.pattern.size - 1))
-        } else {
-          Rock.fill(Math.random().round.toInt * (Rock.fill.size - 1))
-        }
-      case Jazz =>
-        if (count % 4 != 0) {
-          Jazz.pattern(Math.random().round.toInt * (Jazz.pattern.size - 1))
-        } else {
-          Jazz.fill(Math.random().round.toInt * (Jazz.fill.size - 1))
-        }
-      case Funk =>
-        if (count % 4 != 0) {
-          Funk.pattern(Math.random().round.toInt * (Funk.pattern.size - 1))
-        } else {
-          Funk.fill(Math.random().round.toInt * (Funk.fill.size - 1))
-        }
+    if (count % 4 != 0) {
+      style.pattern(Math.random().round.toInt * (style.pattern.size - 1))
+    } else {
+      style.fill(Math.random().round.toInt * (style.fill.size - 1))
     }
   }
 

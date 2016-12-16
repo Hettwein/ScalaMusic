@@ -109,7 +109,11 @@ package object parser {
     //      case m ~ None => (m++m).flatten
     //      case m ~ Some(a) => (for(i <- 0 until a.size) yield m.flatten++a(i)).flatten
     //    }
-    def repeat: Parser[Repeat] = "|:" ~> rep1(measure) ~ opt(rep1("[" ~> rep1(measure) <~ "]")) <~ ":|" ^^ {
+    //    def repeat: Parser[Repeat] = "|:" ~> rep1(measure) ~ opt(rep1("[" ~> rep1(measure) <~ "]")) <~ ":|" ^^ {
+    //      case m ~ None => new Repeat(m)
+    //      case m ~ Some(a) => new Repeat(m, a)
+    //    }
+    def repeat: Parser[Repeat] = "|:" ~> rep1(measure | repeat) ~ opt(rep1("[" ~> rep1(measure) <~ "]")) <~ ":|" ^^ {
       case m ~ None => new Repeat(m)
       case m ~ Some(a) => new Repeat(m, a)
     }

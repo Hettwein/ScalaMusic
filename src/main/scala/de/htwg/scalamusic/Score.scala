@@ -6,6 +6,13 @@ case class Score(style: Style, music: Seq[Staff] = Seq()) extends MusicConversio
                               |  ${music.foldLeft("")((s, m) => s + m.asLy + " ")}
                               |>>
                               |\\layout { }
+                              |}
+                              |
+                              |\\score {
+                              |\\unfoldRepeats 
+                              |<<
+                              |  ${music.foldLeft("")((s, m) => s + m.asLy + " ")}
+                              |>>
                               |\\midi {
                               |  \\context {
                               |    \\Staff
