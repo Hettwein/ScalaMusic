@@ -145,12 +145,16 @@ package object parser {
       case d ~ "/" ~ n => TimeSignature(d.toInt, n.toInt)
     }
 
-    def style: Parser[String] = "style" ~> (opt("\'") ~> """([a-z,A-Z,0-9,(,), ]*)""".r) <~ opt("\'") ^^ {
-      case s => s
+    def style: Parser[Style] = "style" ~> (opt("\'") ~> """([a-z,A-Z,0-9,(,), ]*)""".r) <~ opt("\'") ^^ {
+      case s => s match {
+        case "jazz" => Jazz
+        case "rock" => Rock
+        case "funk" => Funk
+      }
     }
 
     def score: Parser[Score] = opt("(") ~> style ~ rep1(staff) <~ opt(")") ^^ {
-      case s ~ m => Score(Style(s), m)
+      case s ~ m => Score(s, m)
     }
 
     def apply(input: String): Score = parseAll(score, input) match {

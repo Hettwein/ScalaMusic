@@ -4,7 +4,7 @@ import scala.language.postfixOps
 
 object ScaleDegree extends Enumeration {
   type ScaleDegree = Value
-  val I, II, III, IV, V, VI, VII = Value
+  val I, II, III, IV, V, VI, VII, VIII = Value
 }
 
 object KeySignatureSpelling extends Enumeration {
@@ -28,7 +28,8 @@ trait Key extends MusicConversion with HasKeySignatureSpelling {
     scale(3) -> ScaleDegree.IV,
     scale(4) -> ScaleDegree.V,
     scale(5) -> ScaleDegree.VI,
-    scale(6) -> ScaleDegree.VII)
+    scale(6) -> ScaleDegree.VII,
+		scale(6) -> ScaleDegree.VIII)
 
   def getDegreeIndex(p: Pitch): Int = { val idx = scale.indexOf(p); if (idx != -1) idx else if (getSpelling == KeySignatureSpelling.Flats) scale.indexOf(p.chromaticUp(getSpelling)) else scale.indexOf(p.chromaticDown(getSpelling)) }
   def stepUp(from: Pitch): Pitch = { val idx = scale.indexOf(from); if (idx < 6) scale(idx + 1) else scale(idx - 6)+ }
@@ -58,6 +59,7 @@ case class MajorScale(root: Pitch) extends Key {
     case ScaleDegree.V => Interval.getPitch(root, IntervalQuality.Fifth, getSpelling)
     case ScaleDegree.VI => Interval.getPitch(root, IntervalQuality.MajorSixth, getSpelling)
     case ScaleDegree.VII => Interval.getPitch(root, IntervalQuality.MajorSeventh, getSpelling)
+    case ScaleDegree.VIII => Interval.getPitch(root, IntervalQuality.Octave, getSpelling)
   }
 
   override def asLy: String = s"""\\key ${root.asLy} \\major """
@@ -87,6 +89,7 @@ case class MinorScale(root: Pitch) extends Key {
     case ScaleDegree.V => Interval.getPitch(root, IntervalQuality.Fifth, getSpelling)
     case ScaleDegree.VI => Interval.getPitch(root, IntervalQuality.MinorSixth, getSpelling)
     case ScaleDegree.VII => Interval.getPitch(root, IntervalQuality.MinorSeventh, getSpelling)
+    case ScaleDegree.VIII => Interval.getPitch(root, IntervalQuality.Octave, getSpelling)
   }
 
   override def asLy: String = s"""\\key ${root.asLy} \\minor """
@@ -102,6 +105,7 @@ case class MinorPentatonicScale(root: Pitch) extends Key {
     case ScaleDegree.III => Interval.getPitch(root, IntervalQuality.Fourth, getSpelling)
     case ScaleDegree.IV => Interval.getPitch(root, IntervalQuality.Fifth, getSpelling)
     case ScaleDegree.V => Interval.getPitch(root, IntervalQuality.MinorSeventh, getSpelling)
+    case ScaleDegree.VI => Interval.getPitch(root, IntervalQuality.Octave, getSpelling)
     case _ => root
   }
 
@@ -144,6 +148,7 @@ case class MixolydianScale(root: Pitch) extends Key {
     case ScaleDegree.V => Interval.getPitch(root, IntervalQuality.Fifth, getSpelling)
     case ScaleDegree.VI => Interval.getPitch(root, IntervalQuality.MajorSixth, getSpelling)
     case ScaleDegree.VII => Interval.getPitch(root, IntervalQuality.MinorSeventh, getSpelling)
+    case ScaleDegree.VIII => Interval.getPitch(root, IntervalQuality.Octave, getSpelling)
   }
 
   override def asLy: String = s"""\\key ${getDegreePitch(ScaleDegree.IV).asLy} \\major """
