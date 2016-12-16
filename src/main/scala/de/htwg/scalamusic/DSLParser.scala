@@ -27,12 +27,10 @@ package object parser {
       case s => s
     }
 
-    def note: Parser[Note] = pitchClass ~ opt(pitchDecorator) ~
-      opt(pitchOctave) ~ """([\d])""".r ~ opt(noteAdditional) ^^ {
-        case c ~ d ~ o ~ b ~ Some(a) =>
-          Note(Pitch(c, d.getOrElse(PitchDecorator.Blank),
-            o.getOrElse(0)), if (a == ".") Beat(3, 2 * b.toInt) else Beat(1, b.toInt), a == "~")
-      }
+    def note: Parser[Note] = pitch ~ """([\d])""".r ~ opt(noteAdditional) ^^ {
+      case p ~ b ~ Some(a) =>
+        Note(p, if (a == ".") Beat(3, 2 * b.toInt) else Beat(1, b.toInt), a == "~")
+    }
 
     //    def tiedNote: Parser[Note] = note ~ rep1("~" ~ note) ^^ {
     //      case n ~ tn => {
@@ -103,20 +101,20 @@ package object parser {
       case None ~ None ~ None ~ Some(s) ~ Some(p) ~ m => Measure(tempo = s.toInt, music = m.flatten, tempoChange = true, partial = p)
     }
 
-//    def measures: Parser[Seq[Measure]] = rep1(measure) ^^ {
-//      case m => m
-//    }
+    //    def measures: Parser[Seq[Measure]] = rep1(measure) ^^ {
+    //      case m => m
+    //    }
 
     //    def repetition: Parser[Seq[Measure]] = "|:" ~> rep1(measures | repetition) ~ opt(rep1("[" ~> measures <~ "]"))<~ ":|" ^^ {
     //      case m ~ None => (m++m).flatten
     //      case m ~ Some(a) => (for(i <- 0 until a.size) yield m.flatten++a(i)).flatten
     //    }
-    def repetition: Parser[Repetition] = "|:" ~> rep1(measure) ~ opt(rep1("[" ~> rep1(measure) <~ "]")) <~ ":|" ^^ {
-      case m ~ None => new Repetition(m)
-      case m ~ Some(a) => new Repetition(m, a)
+    def repeat: Parser[Repeat] = "|:" ~> rep1(measure) ~ opt(rep1("[" ~> rep1(measure) <~ "]")) <~ ":|" ^^ {
+      case m ~ None => new Repeat(m)
+      case m ~ Some(a) => new Repeat(m, a)
     }
 
-    def voice: Parser[Voice] = opt("(") ~> opt(instrument) ~ rep1(measure | repetition) <~ opt(")") ^^ {
+    def voice: Parser[Voice] = opt("(") ~> opt(instrument) ~ rep1(measure | repeat) <~ opt(")") ^^ {
       case None ~ m => new Voice(music = m)
       case Some(i) ~ m => new Voice(m, i)
     }
@@ -125,12 +123,12 @@ package object parser {
       case i => i
     }
 
-    def chords: Parser[ChordProgression] = opt("chords(") ~> opt(instrument) ~ rep1(measure | repetition) <~ opt(")") ^^ {
+    def chords: Parser[ChordProgression] = opt("chords(") ~> opt(instrument) ~ rep1(measure | repeat) <~ opt(")") ^^ {
       case None ~ m => ChordProgression(music = m)
       case Some(i) ~ m => ChordProgression(m, i)
     }
 
-    def key: Parser[Mode] = "key" ~> pitch ~ opt("""([m])""".r) ^^ {
+    def key: Parser[Key] = "key" ~> pitch ~ opt("""([m])""".r) ^^ {
       case p ~ Some(m) => MinorScale(p)
       case p ~ None => MajorScale(p)
     }

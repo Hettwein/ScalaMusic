@@ -1,6 +1,6 @@
 package de.htwg.scalamusic
 
-case class Repetition(measures: Seq[Measure], alternatives: Seq[Seq[Measure]] = Seq()) extends MusicSegment {
+case class Repeat(measures: Seq[Measure], alternatives: Seq[Seq[Measure]] = Seq()) extends MusicSegment {
   
   val music: Seq[Measure] = measures++alternatives.map { x => x }.flatten
 //		  val music: Seq[Measure] = alternatives.map { x => measures++x }.flatten

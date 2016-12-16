@@ -6,6 +6,9 @@ case class Interval(root: Pitch = Pitch(), quality: IntervalQuality.Value, durat
     case _ => Seq(root)
     //    case IntervalQuality. => Seq(root)
   }
+
+  def asLy: String = toString
+  def asDSL: String = toString
 }
 
 object Interval {
@@ -54,7 +57,6 @@ object IntervalQuality extends Enumeration {
     MinorSeventh -> 10,
     MajorSeventh -> 11,
     Octave -> 12,
-    Ninth -> 14
-  )
+    Ninth -> 14)
   def toPitchNumber(quality: IntervalQuality.Value): Int = midi(quality)
 }

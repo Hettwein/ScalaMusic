@@ -27,8 +27,21 @@ case class Chord(root: Pitch = Pitch(), quality: ChordQuality.Value = ChordQuali
       val scale = new MajorScale(root); Seq(root, scale.getDegreePitch(ScaleDegree.V), scale.getDegreePitch(ScaleDegree.I)+)
   }
 
-  override def asLy: String = s"""< ${music.foldLeft("")((s, m) => s + m.asLy + " ")}>${if (duration.numerator == 1) duration.denominator else duration.denominator / 2 + "."}${if (tied) "~" else ""}"""
-  override def asDSL: String = s"""${root.asDSL}${ChordQuality.getAbbr(quality)}:${if (duration.numerator == 1) duration.denominator else duration.denominator / 2 + "."}${if (tied) "~" else ""}"""
+    
+  def getScale(): Key = quality match {
+    case ChordQuality.Major => MajorScale(root)
+    case ChordQuality.Minor => MinorScale(root)
+    case ChordQuality.Seventh => MajorScale(root)
+    case ChordQuality.MajorSeventh => MajorScale(root)
+    case ChordQuality.MinorSeventh => MinorScale(root)
+    case ChordQuality.SuspendedSecond => MajorScale(root)
+    case ChordQuality.SuspendedFourth => MajorScale(root)
+//    case ChordQuality.Major => MajorScale(root)
+//    case ChordQuality.Major => MajorScale(root)
+  }
+ 
+  def asLy: String = s"""< ${music.foldLeft("")((s, m) => s + m.asLy + " ")}>${if (duration.numerator == 1) duration.denominator else duration.denominator / 2 + "."}${if (tied) "~" else ""}"""
+  def asDSL: String = s"""${root.asDSL}${ChordQuality.getAbbr(quality)}:${if (duration.numerator == 1) duration.denominator else duration.denominator / 2 + "."}${if (tied) "~" else ""}"""
   //  override def asDSL: String = s"""< ${music.foldLeft("")((s, m) => s + m.asDSL + " ")}>${if (duration.numerator == 1) duration.denominator else duration.denominator / 2 + "."}${if (tied) "~" else ""}"""
 }
 

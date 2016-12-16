@@ -19,6 +19,8 @@ case class Beat(numerator: Int = 1, denominator: Int = 4) extends MusicConversio
 
   def getValue(): Double = numerator.toDouble / denominator.toDouble
 
+  def asLy: String = toString
+  def asDSL: String = toString
   //  def getRandom(min: Beat, max: Beat): Beat = {
   ////    (Math.random() * 1 + time.denominator).floor.toInt
   ////    val rand = Math.random() * max.getValue() + min.getValue()

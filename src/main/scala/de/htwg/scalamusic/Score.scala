@@ -22,7 +22,7 @@ case class Score(style: Style.Value, music: Seq[Staff] = Seq()) extends MusicCon
 
 object Style extends Enumeration {
   type Style = Value
-  val jazz, rock, funk, pop, blues, blues2, random, randomTriplets, beat, follow = Value // look for proper styles
+  val jazz, rock, funk, funky, pop, shuffle, blues, blues2, random, randomTriplets, beat, follow = Value // look for proper styles
 
   def apply(s: String): Style = withName(s)
 }
