@@ -185,13 +185,13 @@ package object parser {
       import java.io._
       import sys.process._
 
-      val path = new File(getClass.getResource("").getPath).getParentFile.getParentFile.getParentFile.getParentFile.getParent + "/lilypond-output"
+      //val path = new File(getClass.getResource("").getPath).getParentFile.getParentFile.getParentFile.getParentFile.getParent + "/lilypond-output"
       val fileName = s"rc-${System.currentTimeMillis()}"
-      val bw = new BufferedWriter(new FileWriter(path + "/" + fileName + ".ly"))
+      val bw = new BufferedWriter(new FileWriter( /*/path + "/" + */ fileName + ".ly"))
       bw.write(generateLy(m))
       bw.close()
 
-      val resultLy = Process("lilypond --pdf " + fileName + ".ly", new File(path)).!!
+      val resultLy = Process("lilypond --pdf " + fileName + ".ly" /*, new File(path)*/ ).!!
       //      println(resultLy)
       //      Process(fileName + ".mid", new File(path)).!!
       //      Process(fileName + ".pdf", new File(path)).!!
