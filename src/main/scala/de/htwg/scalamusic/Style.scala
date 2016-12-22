@@ -20,7 +20,7 @@ object Rock extends Style {
     0 -> Seq((I, Beat(3, 8)), (I, Beat(1, 8)), (I, Beat(1, 2))))
 }
 
-object Funk extends Style {
+object Funk extends Style {//http://www.bassplayer.com/styles/1181/what-the-funk/25901
   import ScaleDegree._
   val name: String = "funk"
   val pattern = Map(
