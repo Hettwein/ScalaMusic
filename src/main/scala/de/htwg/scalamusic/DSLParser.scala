@@ -40,7 +40,18 @@ package object parser {
     //      }
     //    }
 
-    def tuplet: Parser[Tuplet] = opt("(") ~> (rep1(note | chordName) <~ opt(")")) ~ """([\d])""".r ^^ {
+    //    def tuplet: Parser[Seq[MusicElement]] = opt("(") ~> (rep1(note | rest | chordName) <~ opt(")")) ~ """([\d])""".r ^^ {
+    //      case m ~ d => for (i <- 0 until m.size) yield {
+    //        if (m(i).isInstanceOf[Note]) {
+    //          m(i).asInstanceOf[Note].copy(tuplet = d.toInt, tupletNum = if(i==0) 1 else if(i == m.size - 1) 2 else 0)
+    //        } else if (m(i).isInstanceOf[Rest]) {
+    //          m(i).asInstanceOf[Rest].copy(tuplet = d.toInt, tupletNum = if(i==0) 1 else if(i == m.size - 1) 2 else 0)
+    //        } else {
+    //          m(i).asInstanceOf[Chord].copy(tuplet = d.toInt, tupletNum = if(i==0) 1 else if(i == m.size - 1) 2 else 0)
+    //        }
+    //      }
+    //    }
+    def tuplet: Parser[Tuplet] = opt("(") ~> (rep1(note | rest | chordName) <~ opt(")")) ~ """([\d])""".r ^^ {
       case m ~ d => Tuplet(d.toInt, m)
     }
 
@@ -154,6 +165,7 @@ package object parser {
         case "jazz" => Jazz
         case "rock" => Rock
         case "funk" => Funk
+        case "slowRock" => SlowRock
       }
     }
 
@@ -192,6 +204,15 @@ package object parser {
       bw.close()
 
       val resultLy = Process("lilypond --pdf " + fileName + ".ly", new File(path)).!!
+      
+//            //val path = new File(getClass.getResource("").getPath).getParentFile.getParentFile.getParentFile.getParentFile.getParent + "/lilypond-output"
+//      val fileName = s"rc-${System.currentTimeMillis()}"
+//      val bw = new BufferedWriter(new FileWriter( /*/path + "/" + */ fileName + ".ly"))
+//      bw.write(generateLy(m))
+//      bw.close()
+//
+//      val resultLy = Process("lilypond --pdf " + fileName + ".ly" /*, new File(path)*/ ).!!
+      
       //      println(resultLy)
       //      Process(fileName + ".mid", new File(path)).!!
       //      Process(fileName + ".pdf", new File(path)).!!

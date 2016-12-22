@@ -1,9 +1,9 @@
 package de.htwg.scalamusic
 
 case class Repeat(music: Seq[MusicSegment], alternatives: Seq[Seq[Measure]] = Seq()) extends MusicSegment {
-  
-//  val music: Seq[MusicSegment] = measures++alternatives.map { x => x }.flatten
-//		  val music: Seq[Measure] = alternatives.map { x => measures++x }.flatten
+
+  //  val music: Seq[MusicSegment] = measures++alternatives.map { x => x }.flatten
+  //		  val music: Seq[Measure] = alternatives.map { x => measures++x }.flatten
 
   override def asLy(): String = s"""\\repeat volta ${"2"} {${music.foldLeft("")((s, m) => s + m.asLy + " ")}}
                                     |      \\alternative {

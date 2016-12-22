@@ -40,7 +40,8 @@ object PitchClass extends Enumeration {
     F -> 5,
     G -> 7,
     A -> 9,
-    B -> 11)
+    B -> 11
+  )
 
   def apply(s: String): PitchClass = withName(s.toUpperCase)
   def toPitchNumber(p: PitchClass): Int = midi(p)
@@ -59,7 +60,8 @@ object PitchDecorator extends Enumeration {
     Sharp -> "is",
     Flat -> "es",
     DoubleSharp -> "isis",
-    DoubleFlat -> "eses")
+    DoubleFlat -> "eses"
+  )
 
   private val dec = Map(
     "n" -> Natural,
@@ -73,13 +75,15 @@ object PitchDecorator extends Enumeration {
     "##" -> DoubleSharp,
     "eses" -> DoubleFlat,
     "ses" -> DoubleFlat,
-    "_" -> DoubleFlat)
+    "_" -> DoubleFlat
+  )
 
   private val midi = Map(
     Sharp -> 1,
     Flat -> -1,
     DoubleSharp -> 2,
-    DoubleFlat -> -2)
+    DoubleFlat -> -2
+  )
 
   def apply(s: String): PitchDecorator = dec.getOrElse(s, Blank)
   def toPitchNumber(d: PitchDecorator): Int = midi.getOrElse(d, 0)
@@ -105,7 +109,8 @@ object Pitch {
     8 -> "A-",
     9 -> "A",
     10 -> "B-",
-    11 -> "B")
+    11 -> "B"
+  )
 
   def apply(s: String): Pitch = s match {
     case r(p) => new Pitch(PitchClass(p), Blank, 0)

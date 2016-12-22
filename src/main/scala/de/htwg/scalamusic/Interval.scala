@@ -57,6 +57,7 @@ object IntervalQuality extends Enumeration {
     MinorSeventh -> 10,
     MajorSeventh -> 11,
     Octave -> 12,
-    Ninth -> 14)
+    Ninth -> 14
+  )
   def toPitchNumber(quality: IntervalQuality.Value): Int = midi(quality)
 }
