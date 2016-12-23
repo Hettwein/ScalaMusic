@@ -27,10 +27,12 @@ object Funk extends Style {//http://www.bassplayer.com/styles/1181/what-the-funk
     0 -> Seq((I, Beat(1, 4)), (VIII, Beat(1, 4))),
     1 -> Seq((I, Beat(1, 4)), (null, Beat(1, 8)), (null, Beat(1, 16)), (I, Beat(1, 16)), (I, Beat(1, 8)), (I, Beat(1, 8)), (null, Beat(1, 4))),
     2 -> Seq((I, Beat(1, 16)), (I, Beat(1, 16)), (null, Beat(1, 8)), (null, Beat(1, 8)), (null, Beat(1, 16)), (I, Beat(1, 16)), (null, Beat(1, 2))),
-    3 -> Seq((I, Beat(1, 8)), (VIII, Beat(1, 8)), (null, Beat(1, 8)), (I, Beat(1, 16)), (I, Beat(1, 16)), (null, Beat(1, 2))))
+    3 -> Seq((I, Beat(1, 8)), (VIII, Beat(1, 8)), (null, Beat(1, 8)), (I, Beat(1, 16)), (I, Beat(1, 16)), (null, Beat(1, 2))),
+    4 -> Seq((I, Beat(1, 4, Seq(Beat(1, 8), Beat(1, 16)))), (I, Beat(1, 16)), (I, Beat(1, 8)), (I, Beat(1, 8, Seq(Beat(1, 4))))))
 
   val fill = Map(
-    0 -> Seq((I, Beat(1, 8)), (I, Beat(1, 8)), (VIII, Beat(1, 16)), (VIIb, Beat(1, 16)), (V, Beat(1, 16)), (I, Beat(1, 16)), (null, Beat(1, 8)), (null, Beat(1, 16)), (IIIb, Beat(1, 16)), (null, Beat(1, 4))))
+    0 -> Seq((I, Beat(1, 8)), (I, Beat(1, 8)), (VIII, Beat(1, 16)), (VIIb, Beat(1, 16)), (V, Beat(1, 16)), (I, Beat(1, 16)), (null, Beat(1, 8)), (null, Beat(1, 16)), (IIIb, Beat(1, 16)), (null, Beat(1, 4))),
+    1 -> Seq((I, Beat(1, 4, Seq(Beat(1, 8), Beat(1, 16)))), (V, Beat(1, 16)), (VIIb, Beat(1, 16)), (V, Beat(1, 16)), (VI, Beat(1, 16)), (V, Beat(1, 16)), (IV, Beat(1, 16)), (V, Beat(1, 16)), (IIIb, Beat(1, 16)), (III, Beat(1, 16))))
 }
 
 object Jazz extends Style {

@@ -3,7 +3,7 @@ package de.htwg.scalamusic
 import de.htwg.scalamusic._
 import scala.language.postfixOps
 
-case class Chord(root: Pitch = Pitch(), quality: ChordQuality.Value = ChordQuality.Major, duration: Beat = Beat(1, 1), override val tied: Boolean = false, velocity: Int = 70) extends MusicElement {
+case class Chord(root: Pitch = Pitch(), quality: ChordQuality.Value = ChordQuality.Major, duration: Beat = Beat(1, 1), velocity: Int = 70) extends MusicElement {
   //umkehrungen??
   val music = quality match {
     case ChordQuality.Major =>
@@ -39,8 +39,16 @@ case class Chord(root: Pitch = Pitch(), quality: ChordQuality.Value = ChordQuali
     //    case ChordQuality.Major => MajorScale(root)
   }
 
-  def asLy: String = s"""< ${music.foldLeft("")((s, m) => s + m.asLy + " ")}>${if (duration.numerator == 1) duration.denominator else duration.denominator / 2 + "."}${if (tied) "~" else ""}"""
-  def asDSL: String = s"""${root.asDSL}${ChordQuality.getAbbr(quality)}:${if (duration.numerator == 1) duration.denominator else duration.denominator / 2 + "."}${if (tied) "~" else ""}"""
+  def asLy: String = {
+    val p = "< " + music.foldLeft("")((s, m) => s + m.asLy + " ") + ">"
+    val t = duration.tied.foldLeft("")((s, b) => s + "~ " + p + (if (b.numerator == 1) b.denominator else b.denominator / 2 + ".")) + " "
+    s"""${p}${if (duration.numerator == 1) duration.denominator else duration.denominator / 2 + "."}${t}"""
+  }//s"""< ${music.foldLeft("")((s, m) => s + m.asLy + " ")}>${if (duration.numerator == 1) duration.denominator else duration.denominator / 2 + "."}${if (tied) "~" else ""}"""
+  def asDSL: String = {
+    val p = root.asDSL + ChordQuality.getAbbr(quality)
+    val t = duration.tied.foldLeft("")((s, b) => s + "~ " + p + (if (b.numerator == 1) b.denominator else b.denominator / 2 + ".")) + " "
+    s"""${p}${if (duration.numerator == 1) duration.denominator else duration.denominator / 2 + "."}${t}"""
+  }//s"""${root.asDSL}${ChordQuality.getAbbr(quality)}:${if (duration.numerator == 1) duration.denominator else duration.denominator / 2 + "."}${if (tied) "~" else ""}"""
   //  override def asDSL: String = s"""< ${music.foldLeft("")((s, m) => s + m.asDSL + " ")}>${if (duration.numerator == 1) duration.denominator else duration.denominator / 2 + "."}${if (tied) "~" else ""}"""
 }
 

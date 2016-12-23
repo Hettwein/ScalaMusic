@@ -1,6 +1,6 @@
 package de.htwg.scalamusic
 
-case class Interval(root: Pitch = Pitch(), quality: IntervalQuality.Value, duration: Beat = Beat(), override val tied: Boolean = false, velocity: Int = 70) extends MusicElement {
+case class Interval(root: Pitch = Pitch(), quality: IntervalQuality.Value, duration: Beat = Beat(), velocity: Int = 70) extends MusicElement {
 
   val music = quality match {
     case _ => Seq(root)

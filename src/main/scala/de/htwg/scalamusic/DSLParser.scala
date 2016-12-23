@@ -23,23 +23,20 @@ package object parser {
       case c ~ d ~ o => Pitch(c, d.getOrElse(PitchDecorator.Blank), o.getOrElse(0))
     }
 
-    def noteAdditional: Parser[String] = """([.~]?)""".r ^^ {
-      case s => s
-    }
-
-    def note: Parser[Note] = pitch ~ """([\d])""".r ~ opt(noteAdditional) ^^ {
+    def note: Parser[Note] = pitch ~ """([\d])""".r ~ opt(".") ^^ {
       case p ~ b ~ Some(a) =>
-        Note(p, if (a == ".") Beat(3, 2 * b.toInt) else Beat(1, b.toInt), a == "~")
+        Note(p, Beat(3, 2 * b.toInt))
+      case p ~ b ~ None =>
+        Note(p, Beat(1, b.toInt))
     }
 
-    //    def tiedNote: Parser[Note] = note ~ rep1("~" ~ note) ^^ {
-    //      case n ~ tn => {
-    //         val notes = tn.map(_._2)
-    //         val sum = notes.foldLeft(Beat(0, 1))((n, m) => n.sum(m.duration))
-    //        n.copy(duration = n.duration.sum(sum), tied = true)
-    //      }
-    //    }
+    def tiedNote: Parser[Note] = note ~ rep1(opt("~ ") ~> note) ^^ {
+      case n ~ tn => {
+        n.copy(duration = n.duration.copy(tied = tn.map { x => x.duration }))
+      }
+    }
 
+    // evtl ähnlich wie tied
     //    def tuplet: Parser[Seq[MusicElement]] = opt("(") ~> (rep1(note | rest | chordName) <~ opt(")")) ~ """([\d])""".r ^^ {
     //      case m ~ d => for (i <- 0 until m.size) yield {
     //        if (m(i).isInstanceOf[Note]) {
@@ -63,13 +60,16 @@ package object parser {
       ChordQuality(_)
     }
 
-    def chordName: Parser[Chord] = pitch ~ chordQuality ~ ":" ~ """([\d]?)""".r ~ opt(noteAdditional) ^^ {
-      case p ~ q ~ ":" ~ d ~ Some(a) => Chord(p, q, if (a == ".") Beat(3, 2 * d.toInt) else Beat(1, d.toInt), a == "~")
+    def chordName: Parser[Chord] = pitch ~ chordQuality ~ ":" ~ """([\d]?)""".r ~ opt(".") ^^ {
+      case p ~ q ~ ":" ~ d ~ Some(a) => Chord(p, q, Beat(3, 2 * d.toInt))
+      case p ~ q ~ ":" ~ d ~ None => Chord(p, q, Beat(1, d.toInt))
     }
 
-    //    def chord: Parser[Chord] = "<" ~ rep1(pitch) ~ ">" ~ """([\d]?)""".r ~ opt(noteAdditional) ^^ {
-    //      case "<" ~ p ~ ">" ~ d ~ Some(a) => Chord(p, if (a == ".") Beat(3, 2 * d.toInt) else Beat(1, d.toInt), 70)
-    //    }
+    def tiedChord: Parser[Chord] = chordName ~ rep1(opt("~ ") ~> chordName) ^^ {
+      case c ~ tc => {
+        c.copy(duration = c.duration.copy(tied = tc.map { x => x.duration }))
+      }
+    }
 
     def tempo: Parser[Int] = "tempo" ~> """([\d]*)""".r ^^ {
       case t => t.toInt
@@ -79,7 +79,7 @@ package object parser {
       case p => p.toInt
     }
 
-    def measure: Parser[Measure] = opt("|") ~> opt(timeSignature) ~ opt(key) ~ opt(clef) ~ opt(tempo) ~ opt(partial) ~ rep1(note | rest | chordName | tuplet) <~ opt("|") ^^ {
+    def measure: Parser[Measure] = opt("|") ~> opt(timeSignature) ~ opt(key) ~ opt(clef) ~ opt(tempo) ~ opt(partial) ~ rep1(tiedNote | note | rest | tiedChord | chordName | tuplet) <~ opt("|") ^^ {
       case None ~ None ~ None ~ None ~ None ~ m => Measure(music = m.flatten)
       case Some(t) ~ None ~ None ~ None ~ None ~ m => Measure(timeSignature = t, music = m.flatten, timeChange = true)
       case Some(t) ~ Some(k) ~ None ~ None ~ None ~ m => Measure(timeSignature = t, key = k, music = m.flatten, timeChange = true, keyChange = true)
@@ -197,13 +197,20 @@ package object parser {
       import java.io._
       import sys.process._
 
-      //val path = new File(getClass.getResource("").getPath).getParentFile.getParentFile.getParentFile.getParentFile.getParent + "/lilypond-output"
-      val fileName = s"rc-${System.currentTimeMillis()}"
-      val bw = new BufferedWriter(new FileWriter( /*/path + "/" + */ fileName + ".ly"))
-      bw.write(generateLy(m))
-      bw.close()
-
-      val resultLy = Process("lilypond --pdf " + fileName + ".ly" /*, new File(path)*/ ).!!
+//      val path = new File(getClass.getResource("").getPath).getParentFile.getParentFile.getParentFile.getParentFile.getParent + "/lilypond-output"
+//      val fileName = s"rc-${System.currentTimeMillis()}"
+//      val bw = new BufferedWriter(new FileWriter(path + "/" + fileName + ".ly"))
+//      bw.write(generateLy(m))
+//      bw.close()
+//
+//      val resultLy = Process("lilypond --pdf " + fileName + ".ly", new File(path)).!!
+            //val path = new File(getClass.getResource("").getPath).getParentFile.getParentFile.getParentFile.getParentFile.getParent + "/lilypond-output"
+            val fileName = s"rc-${System.currentTimeMillis()}"
+            val bw = new BufferedWriter(new FileWriter( /*/path + "/" + */ fileName + ".ly"))
+          		  bw.write(generateLy(m))
+          		  bw.close()
+          		  
+          		  val resultLy = Process("lilypond --pdf " + fileName + ".ly" /*, new File(path)*/ ).!!
       //      println(resultLy)
       //      Process(fileName + ".mid", new File(path)).!!
       //      Process(fileName + ".pdf", new File(path)).!!
