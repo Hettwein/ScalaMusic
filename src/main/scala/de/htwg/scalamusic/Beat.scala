@@ -1,6 +1,6 @@
 package de.htwg.scalamusic
 
-case class Beat(numerator: Int = 1, denominator: Int = 4, tied: Seq[Beat] = Seq()) extends MusicConversion {
+case class Beat(numerator: Int = 1, denominator: Int = 4, tied: Beat = null) extends MusicConversion {
 
   def sum(b: Beat): Beat = {
     val d = lcm(denominator, b.denominator)
@@ -17,8 +17,18 @@ case class Beat(numerator: Int = 1, denominator: Int = 4, tied: Seq[Beat] = Seq(
   def gcd(a: Int, b: Int): Int = if (b == 0) a.abs else gcd(b, a % b)
   def lcm(a: Int, b: Int) = (a * b).abs / gcd(a, b)
 
-  def getValue(): Double = numerator.toDouble / denominator.toDouble + (if(!tied.isEmpty) tied.foldLeft(Beat(0, 1))((n, b) => n.sum(b)).getValue() else 0)
+  def getValue(): Double = numerator.toDouble / denominator.toDouble + (if(tied != null) getTied.foldLeft(Beat(0, 1))((n, b) => n.sum(b)).getValue() else 0)
   
+  def getTied(): Seq[Beat] = {
+    var t: Seq[Beat] = Seq()
+    var b = this
+    while (b.tied != null) {
+      b = b.tied
+      t = t:+b
+    }
+    t
+  }
+
   def asLy: String = ""
   def asDSL: String = ""
 }

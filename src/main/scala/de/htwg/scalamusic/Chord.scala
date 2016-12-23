@@ -41,14 +41,14 @@ case class Chord(root: Pitch = Pitch(), quality: ChordQuality.Value = ChordQuali
 
   def asLy: String = {
     val p = "< " + music.foldLeft("")((s, m) => s + m.asLy + " ") + ">"
-    val t = duration.tied.foldLeft("")((s, b) => s + "~ " + p + (if (b.numerator == 1) b.denominator else b.denominator / 2 + ".")) + " "
+    val t = duration.getTied.foldLeft("")((s, b) => s + "~ " + p + (if (b.numerator == 1) b.denominator else b.denominator / 2 + ".")) + " "
     s"""${p}${if (duration.numerator == 1) duration.denominator else duration.denominator / 2 + "."}${t}"""
-  }//s"""< ${music.foldLeft("")((s, m) => s + m.asLy + " ")}>${if (duration.numerator == 1) duration.denominator else duration.denominator / 2 + "."}${if (tied) "~" else ""}"""
+  }
   def asDSL: String = {
     val p = root.asDSL + ChordQuality.getAbbr(quality)
-    val t = duration.tied.foldLeft("")((s, b) => s + "~ " + p + (if (b.numerator == 1) b.denominator else b.denominator / 2 + ".")) + " "
+    val t = duration.getTied.foldLeft("")((s, b) => s + "~ " + p + (if (b.numerator == 1) b.denominator else b.denominator / 2 + ".")) + " "
     s"""${p}${if (duration.numerator == 1) duration.denominator else duration.denominator / 2 + "."}${t}"""
-  }//s"""${root.asDSL}${ChordQuality.getAbbr(quality)}:${if (duration.numerator == 1) duration.denominator else duration.denominator / 2 + "."}${if (tied) "~" else ""}"""
+  }
   //  override def asDSL: String = s"""< ${music.foldLeft("")((s, m) => s + m.asDSL + " ")}>${if (duration.numerator == 1) duration.denominator else duration.denominator / 2 + "."}${if (tied) "~" else ""}"""
 }
 

@@ -23,18 +23,22 @@ package object parser {
       case c ~ d ~ o => Pitch(c, d.getOrElse(PitchDecorator.Blank), o.getOrElse(0))
     }
 
-    def note: Parser[Note] = pitch ~ """([\d])""".r ~ opt(".") ^^ {
-      case p ~ b ~ Some(a) =>
+    def note: Parser[Note] = pitch ~ """([\d])""".r ~ opt(".") ~ opt(rep1(("~" ~ opt("|")) ~> note)) ^^ {
+      case p ~ b ~ Some(a) ~ None =>
         Note(p, Beat(3, 2 * b.toInt))
-      case p ~ b ~ None =>
+      case p ~ b ~ None ~ None =>
         Note(p, Beat(1, b.toInt))
+      case p ~ b ~ Some(a) ~ Some(tn) =>
+        Note(p, Beat(3, 2 * b.toInt, tn(0).duration))
+      case p ~ b ~ None ~ Some(tn) =>
+        Note(p, Beat(1, b.toInt, tn(0).duration))
     }
 
-    def tiedNote: Parser[Note] = note ~ rep1(opt("~ ") ~> note) ^^ {
-      case n ~ tn => {
-        n.copy(duration = n.duration.copy(tied = tn.map { x => x.duration }))
-      }
-    }
+//    def tiedNote: Parser[Note] = note ~ rep1(opt("~ ") ~> note) ^^ {
+//      case n ~ tn => {
+//        n.copy(duration = n.duration.copy(tied = tn.map { x => x.duration }))
+//      }
+//    }
 
     // evtl ähnlich wie tied
     //    def tuplet: Parser[Seq[MusicElement]] = opt("(") ~> (rep1(note | rest | chordName) <~ opt(")")) ~ """([\d])""".r ^^ {
@@ -48,7 +52,7 @@ package object parser {
     //        }
     //      }
     //    }
-    def tuplet: Parser[Tuplet] = opt("(") ~> (rep1(note | rest | chordName) <~ opt(")")) ~ """([\d])""".r ^^ {
+    def tuplet: Parser[Tuplet] = opt("(") ~> (rep1(note | rest | chordName) <~ opt(")")) ~ """([\d])""".r ^^ { //tied ?, tuplet ?
       case m ~ d => Tuplet(d.toInt, m)
     }
 
@@ -60,16 +64,18 @@ package object parser {
       ChordQuality(_)
     }
 
-    def chordName: Parser[Chord] = pitch ~ chordQuality ~ ":" ~ """([\d]?)""".r ~ opt(".") ^^ {
-      case p ~ q ~ ":" ~ d ~ Some(a) => Chord(p, q, Beat(3, 2 * d.toInt))
-      case p ~ q ~ ":" ~ d ~ None => Chord(p, q, Beat(1, d.toInt))
+    def chordName: Parser[Chord] = pitch ~ chordQuality ~ ":" ~ """([\d]?)""".r ~ opt(".") ~ opt(rep1(("~" ~ opt("|")) ~> chordName)) ^^ {
+      case p ~ q ~ ":" ~ d ~ Some(a) ~ None => Chord(p, q, Beat(3, 2 * d.toInt))
+      case p ~ q ~ ":" ~ d ~ None ~ None => Chord(p, q, Beat(1, d.toInt))
+      case p ~ q ~ ":" ~ d ~ Some(a) ~ Some(tc) => Chord(p, q, Beat(3, 2 * d.toInt, tc(0).duration))
+      case p ~ q ~ ":" ~ d ~ None ~ Some(tc) => Chord(p, q, Beat(1, d.toInt, tc(0).duration))
     }
 
-    def tiedChord: Parser[Chord] = chordName ~ rep1(opt("~ ") ~> chordName) ^^ {
-      case c ~ tc => {
-        c.copy(duration = c.duration.copy(tied = tc.map { x => x.duration }))
-      }
-    }
+//    def tiedChord: Parser[Chord] = chordName ~ rep1(opt("~ ") ~> chordName) ^^ {
+//      case c ~ tc => {
+//        c.copy(duration = c.duration.copy(tied = tc.map { x => x.duration }))
+//      }
+//    }
 
     def tempo: Parser[Int] = "tempo" ~> """([\d]*)""".r ^^ {
       case t => t.toInt
@@ -79,7 +85,7 @@ package object parser {
       case p => p.toInt
     }
 
-    def measure: Parser[Measure] = opt("|") ~> opt(timeSignature) ~ opt(key) ~ opt(clef) ~ opt(tempo) ~ opt(partial) ~ rep1(tiedNote | note | rest | tiedChord | chordName | tuplet) <~ opt("|") ^^ {
+    def measure: Parser[Measure] = opt("|") ~> opt(timeSignature) ~ opt(key) ~ opt(clef) ~ opt(tempo) ~ opt(partial) ~ rep1(note | rest | chordName | tuplet) <~ opt("|") ^^ {
       case None ~ None ~ None ~ None ~ None ~ m => Measure(music = m.flatten)
       case Some(t) ~ None ~ None ~ None ~ None ~ m => Measure(timeSignature = t, music = m.flatten, timeChange = true)
       case Some(t) ~ Some(k) ~ None ~ None ~ None ~ m => Measure(timeSignature = t, key = k, music = m.flatten, timeChange = true, keyChange = true)
