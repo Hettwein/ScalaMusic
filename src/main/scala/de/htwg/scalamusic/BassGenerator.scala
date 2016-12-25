@@ -7,25 +7,21 @@ class BassGenerator(val score: Score) {
   var last: (Double, Seq[(ScaleDegree.Value, Beat)]) = (0, Seq())
 
   def generate(): Score = {
-    val bassline = generate(score.style, extractChords().music, TimeSignature(), MajorScale(Pitch()))
+    val bassline = generate(score.style, extractChords().music)
     score.copy(music = Seq(Staff(score.music(0).music :+ new Voice(bassline, "electric bass (finger)"))))
   }
 
-  def generate(style: Style, segments: Seq[MusicSegment], time: TimeSignature, key: Key, n: Int = 0): Seq[MusicSegment] = {
+  def generate(style: Style, segments: Seq[MusicSegment], n: Int = 0): Seq[MusicSegment] = {
     val a = Math.random()
     val b = Math.random()
-    for (i <- 0 until segments.size) yield { // iterate over measures
-      var k = key
-      var t = time
+    for (i <- 0 until segments.size) yield { // iterate over measures/ repeats
       if (segments(i).isInstanceOf[Measure]) {
         val bar = segments(i).asInstanceOf[Measure]
-        if (k != bar.key) k = bar.key
-        if (t != bar.timeSignature) t = bar.timeSignature
-        val music: Seq[MusicElement] = applyPattern(bar.music.asInstanceOf[Seq[Chord]], t, getPattern(style, a, b, if (n == 0) i + 1 else n)) //// // style.swing?
-        Measure(timeSignature = t, key = k, clef = Clef.bass, timeChange = bar.timeChange, clefChange = bar.clefChange || segments(0) == bar, keyChange = bar.keyChange, tempoChange = bar.tempoChange, music = music, partial = bar.partial)
+        val music: Seq[MusicElement] = applyPattern(bar.music.asInstanceOf[Seq[Chord]], bar.timeSignature, getPattern(style, a, b, if (n == 0) i + 1 else n)) //// // style.swing?
+        bar.copy(clef = Clef.bass, music = music, clefChange = segments(0) == bar)
       } else {
         val rep = segments(i).asInstanceOf[Repeat]
-        Repeat(generate(style, rep.music, time, key), rep.alternatives.map { x => generate(style, x, time, key, 4).asInstanceOf[Seq[Measure]] })
+        Repeat(generate(style, rep.music), rep.alternatives.map { x => generate(style, x, 4).asInstanceOf[Seq[Measure]] })
       }
     }
   }

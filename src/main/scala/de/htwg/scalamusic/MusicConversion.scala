@@ -6,8 +6,11 @@ trait MusicConversion {
 
   /** Format this Music object as a DSL string. */
   def asDSL: String
-  //  def asLy: String = this.toString().toLowerCase() //name + duration + attribute + " "
-  //  def asDSL: String = this.toString().toLowerCase()
 }
 
 trait MusicSegment extends MusicConversion
+
+trait MusicElement extends MusicConversion with Traversable[MusicElement] {
+  val duration: Beat
+  def foreach[U](f: MusicElement => U) = f(this)
+}
