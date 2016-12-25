@@ -6,11 +6,11 @@ case class Measure(
     clef: Clef.Value = Clef.treble,
     tempo: Int = 105,
     music: Seq[MusicElement] = Seq(),
+    partial: Int = 0,
     keyChange: Boolean = false,
     timeChange: Boolean = false,
     clefChange: Boolean = false,
-    tempoChange: Boolean = false,
-    partial: Int = 0
+    tempoChange: Boolean = false
 ) extends MusicSegment {
 
   override def asLy: String = s"""${if (timeChange) timeSignature.asLy else ""}${if (keyChange) key.asLy else ""}${if (clefChange) "\\" + Clef.toString(clef) else ""}${if (tempoChange) "\\tempo " + timeSignature.denominator + " = " + tempo + " " else ""}${if (partial != 0) "\\partial " + partial + " " else ""}${music.foldLeft("")((s, m) => s + m.asLy + " ")}|"""
