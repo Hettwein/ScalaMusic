@@ -233,7 +233,7 @@ package object parser {
           		  bw.close()
           		  
           		  val resultLy = Process("lilypond --pdf " + fileName + ".ly" /*, new File(path)*/ ).!!
-      //      println(resultLy)
+            println(resultLy)
       //      Process(fileName + ".mid", new File(path)).!!
       //      Process(fileName + ".pdf", new File(path)).!!
     }

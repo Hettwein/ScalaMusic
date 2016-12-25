@@ -11,8 +11,8 @@ case class Pitch(pitchClass: PitchClass.Value = PitchClass.C, decorator: PitchDe
   def + = copy(octave = octave + 1)
   def - = copy(octave = octave - 1)
 
-  def chromaticUp(sign: KeySignatureSpelling.Value) = Interval.getPitch(this, IntervalQuality.MinorSecond, sign)
-  def chromaticDown(sign: KeySignatureSpelling.Value) = Interval.getPitch(this, IntervalQuality.MajorSeventh, sign)-
+  def chromaticUp(sign: KeySignatureSpelling.Value) = Pitch((Pitch.midi(this.toPitchNumber + 1, sign)))
+  def chromaticDown(sign: KeySignatureSpelling.Value) = Pitch((Pitch.midi(this.toPitchNumber - 1, sign)))
 
   override def toString: String = {
     var octaves = "";
@@ -66,16 +66,11 @@ object PitchDecorator extends Enumeration {
   private val dec = Map(
     "n" -> Natural,
     "is" -> Sharp,
-    "#" -> Sharp,
     "es" -> Flat,
     "s" -> Flat,
-    "-" -> Flat,
     "isis" -> DoubleSharp,
-    "x" -> DoubleSharp,
-    "##" -> DoubleSharp,
     "eses" -> DoubleFlat,
-    "ses" -> DoubleFlat,
-    "_" -> DoubleFlat
+    "ses" -> DoubleFlat
   )
 
   private val midi = Map(
@@ -87,29 +82,45 @@ object PitchDecorator extends Enumeration {
 
   def apply(s: String): PitchDecorator = dec.getOrElse(s, Blank)
   def toPitchNumber(d: PitchDecorator): Int = midi.getOrElse(d, 0)
-  //  def toString(d: PitchDecorator.Value): String = dec.map(_.swap).getOrElse(d, "")
   def toString(d: PitchDecorator.Value): String = decStr(d)
 }
 
 object Pitch {
   import PitchClass._
   import PitchDecorator._
+  import KeySignatureSpelling._
 
   private val r = """([a-g,A-G])(isis|is|eses|ses|es|s|[n|#|x|X|\-|_]?)([,|']*)""".r
 
   private val midi = Map(
-    0 -> "C",
-    1 -> "C#",
-    2 -> "D",
-    3 -> "E-",
-    4 -> "E",
-    5 -> "F",
-    6 -> "F#",
-    7 -> "G",
-    8 -> "A-",
-    9 -> "A",
-    10 -> "B-",
-    11 -> "B"
+    (0, Sharps) -> "Bis",
+    (0, Sharps) -> "C",
+    (0, Flats) -> "C",
+    (1, Sharps) -> "Cis",
+    (1, Flats) -> "Des",
+    (2, Sharps) -> "D",
+    (2, Flats) -> "D",
+    (3, Sharps) -> "Dis",
+    (3, Flats) -> "Es",
+    (4, Sharps) -> "E",
+    (4, Flats) -> "E",
+    (4, Flats) -> "Fes",
+    (5, Sharps) -> "Eis",
+    (5, Sharps) -> "F",
+    (5, Flats) -> "F",
+    (6, Sharps) -> "Fis",
+    (6, Flats) -> "Ges",
+    (7, Sharps) -> "G",
+    (7, Flats) -> "G",
+    (8, Sharps) -> "Gis",
+    (8, Flats) -> "As",
+    (9, Sharps) -> "A",
+    (9, Flats) -> "A",
+    (10, Sharps) -> "Ais",
+    (10, Flats) -> "Bes",
+    (11, Sharps) -> "B",
+    (11, Flats) -> "B",
+    (11, Flats) -> "Ces"
   )
 
   def apply(s: String): Pitch = s match {
@@ -119,14 +130,14 @@ object Pitch {
       o.count(c => (c == ''')) - o.count(c => (c == ',')))
   }
 
-  def apply(i: Int): Pitch = {
+  def apply(i: Int, sign: KeySignatureSpelling.Value): Pitch = {
     var octaves = "";
     if (i >= 0) {
       octaves = "'" * (i / 12)
     } else {
       octaves = "," * (Math.abs(i - 12) / 12)
     }
-    Pitch((midi(Math.abs((i + 48) % 12)) + octaves))
+    Pitch((midi(Math.abs((i + 48) % 12), sign) + octaves))
   }
 
   //  def apply(pitch: PitchClass.Value): Pitch = new Pitch(pitch, Blank, 0)
