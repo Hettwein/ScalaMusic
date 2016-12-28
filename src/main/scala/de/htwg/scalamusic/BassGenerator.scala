@@ -17,7 +17,8 @@ class BassGenerator(val score: Score) {
     for (i <- 0 until segments.size) yield { // iterate over measures/ repeats
       if (segments(i).isInstanceOf[Measure]) {
         val bar = segments(i).asInstanceOf[Measure]
-        val music: Seq[MusicElement] = applyPattern(bar.music.asInstanceOf[Seq[Chord]], bar.timeSignature, getPattern(style, a, b, if (n == 0) i + 1 else n)) //// // style.swing?
+        val d = bar.music.foldLeft(Beat(0, 1))((n, m) => n.sum(m.duration)).getValue()
+        val music: Seq[MusicElement] = applyPattern(bar.music.asInstanceOf[Seq[Chord]], bar.timeSignature, getPattern(style, a, b, if (n == 0) i + 1 else n), d)
         bar.copy(clef = Clef.bass, music = music, clefChange = segments(0) == bar)
       } else {
         val rep = segments(i).asInstanceOf[Repeat]
@@ -42,7 +43,7 @@ class BassGenerator(val score: Score) {
     }
   }
 
-  def applyPattern(chords: Seq[Chord], time: TimeSignature, pattern: Seq[(ScaleDegree.Value, Beat)]): Seq[MusicElement] = { //swing = true
+  def applyPattern(chords: Seq[Chord], time: TimeSignature, pattern: Seq[(ScaleDegree.Value, Beat)], measureLength: Double): Seq[MusicElement] = { //swing = true
     val t = time.numerator.toDouble / time.denominator.toDouble
     val duration: Beat = pattern.foldLeft(Beat(0, 1))((n, m) => n.sum(m._2))
     var d = 0.0
@@ -50,7 +51,7 @@ class BassGenerator(val score: Score) {
     var c = 0.0
     last = (t / duration.getValue * pattern.size, pattern)
     var triplets = false
-    for (i <- 0 until (t / duration.getValue * pattern.size).toInt; if (d < 1.0 && ((pattern(i % pattern.size)._2.denominator % 3 == 0 && !triplets) || pattern(i % pattern.size)._2.denominator % 3 != 0))) yield { ////
+    for (i <- 0 until (measureLength / duration.getValue * pattern.size).toInt; if (d < measureLength && ((pattern(i % pattern.size)._2.denominator % 3 == 0 && !triplets) || pattern(i % pattern.size)._2.denominator % 3 != 0))) yield { ////
       val p = pattern(i % pattern.size)
       c = BigDecimal(c).setScale(7, BigDecimal.RoundingMode.HALF_UP).toDouble //  
       if (c >= chords(n).duration.getValue()) {

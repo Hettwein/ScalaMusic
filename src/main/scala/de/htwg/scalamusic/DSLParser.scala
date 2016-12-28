@@ -59,7 +59,7 @@ package object parser {
     //        else if (e.isInstanceOf[Rest]) e.asInstanceOf[Rest].copy(tuplet = tup)
     //        else e.asInstanceOf[Chord].copy(tuplet = tup)
     //    }
-    def tuplet: Parser[Tuplet] = opt("{") ~> (rep1(note | rest | chordName) <~ opt("}")) ~ """([\d])""".r ^^ { //tied ?, tuplet ?
+    def tuplet: Parser[Tuplet] = "{" ~> (rep1(note | rest | chordName | tuplet) <~ "}") ~ """([\d])""".r ^^ { //tied ?, tuplet ?
       case m ~ d => Tuplet(d.toInt, m)
     }
 
@@ -156,11 +156,11 @@ package object parser {
       case Some(i) ~ m => new Voice(m, i)
     }
 
-    def instrument: Parser[String] = "instr" ~> (opt("\'") ~> """([a-z,A-Z,0-9,(,), ]*)""".r) <~ opt("\'") ^^ {
+    def instrument: Parser[String] = "instr" ~> ("\'" ~> """([a-z,A-Z,0-9,(,), ]*)""".r) <~ "\'" ^^ {
       case i => i
     }
 
-    def chords: Parser[ChordProgression] = opt("chords(") ~> opt(instrument) ~ rep1(measure | repeat) <~ opt(")") ^^ {
+    def chords: Parser[ChordProgression] = "chords(" ~> opt(instrument) ~ rep1(measure | repeat) <~ ")" ^^ {
       case None ~ m => ChordProgression(music = m)
       case Some(i) ~ m => ChordProgression(m, i)
     }
@@ -233,7 +233,7 @@ package object parser {
           		  bw.close()
           		  
           		  val resultLy = Process("lilypond --pdf " + fileName + ".ly" /*, new File(path)*/ ).!!
-            println(resultLy)
+      //      println(resultLy)
       //      Process(fileName + ".mid", new File(path)).!!
       //      Process(fileName + ".pdf", new File(path)).!!
     }

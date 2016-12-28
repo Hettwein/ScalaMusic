@@ -11,7 +11,7 @@ case class Chord(root: Pitch = Pitch(), quality: ChordQuality.Value = ChordQuali
     case ChordQuality.Minor =>
       val scale = new MinorScale(root); Seq(root, scale.getDegreePitch(ScaleDegree.III), scale.getDegreePitch(ScaleDegree.V))
     case ChordQuality.Seventh =>
-      val scale = new MajorScale(root); Seq(root, scale.getDegreePitch(ScaleDegree.VIIb), scale.getDegreePitch(ScaleDegree.II), scale.getDegreePitch(ScaleDegree.IV))
+      val scale = new MajorScale(root); Seq(root, scale.getDegreePitch(ScaleDegree.III), scale.getDegreePitch(ScaleDegree.V), scale.getDegreePitch(ScaleDegree.VIIb))
     case ChordQuality.MajorSeventh =>
       val scale = new MajorScale(root); Seq(root, scale.getDegreePitch(ScaleDegree.III), scale.getDegreePitch(ScaleDegree.V), scale.getDegreePitch(ScaleDegree.VII))
     case ChordQuality.MinorSeventh =>
@@ -23,7 +23,11 @@ case class Chord(root: Pitch = Pitch(), quality: ChordQuality.Value = ChordQuali
     case ChordQuality.Sixth =>
       val scale = new MajorScale(root); Seq(root, scale.getDegreePitch(ScaleDegree.III), scale.getDegreePitch(ScaleDegree.V), scale.getDegreePitch(ScaleDegree.VI))
     case ChordQuality.Fifth =>
-      val scale = new MajorScale(root); Seq(root, scale.getDegreePitch(ScaleDegree.V), scale.getDegreePitch(ScaleDegree.I)+)
+      val scale = new MajorScale(root); Seq(root, scale.getDegreePitch(ScaleDegree.V), scale.getDegreePitch(ScaleDegree.VIII))
+    case ChordQuality.Diminshed =>
+      val scale = new MajorScale(root); Seq(root, scale.getDegreePitch(ScaleDegree.IIIb), scale.getDegreePitch(ScaleDegree.Vb))
+    case ChordQuality.Augmented =>
+      val scale = new MajorScale(root); Seq(root, scale.getDegreePitch(ScaleDegree.III), scale.getDegreePitch(ScaleDegree.VIb))
   }
 
   def getScale(): Key = quality match {
@@ -36,6 +40,8 @@ case class Chord(root: Pitch = Pitch(), quality: ChordQuality.Value = ChordQuali
     case ChordQuality.SuspendedFourth => MajorScale(root)
     case ChordQuality.Sixth => MajorScale(root)
     case ChordQuality.Fifth => MajorScale(root)//?
+    case ChordQuality.Diminshed => MajorScale(root)//?
+    case ChordQuality.Augmented => MajorScale(root)//?
   }
 
   def asLy: String = {

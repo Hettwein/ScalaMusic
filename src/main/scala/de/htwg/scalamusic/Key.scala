@@ -4,7 +4,7 @@ import scala.language.postfixOps
 
 object ScaleDegree extends Enumeration {
   type ScaleDegree = Value
-  val I, II, III, IIIb, IV, V, Vb, VI, VII, VIIb, VIII = Value
+  val I, II, III, IIIb, IV, V, Vb, VI, VIb, VII, VIIb, VIII = Value
 }
 
 object KeySignatureSpelling extends Enumeration {
@@ -50,6 +50,7 @@ case class MajorScale(root: Pitch) extends Key {
     case ScaleDegree.V => Pitch(root.toPitchNumber + 7, getSpelling)
     case ScaleDegree.Vb => Pitch(root.toPitchNumber + 6, Flats)
     case ScaleDegree.VI => Pitch(root.toPitchNumber + 9, getSpelling)
+    case ScaleDegree.VIb => Pitch(root.toPitchNumber + 8, Flats)
     case ScaleDegree.VII => Pitch(root.toPitchNumber + 11, getSpelling)
     case ScaleDegree.VIIb => Pitch(root.toPitchNumber + 10, Flats)
     case ScaleDegree.VIII => Pitch(root.toPitchNumber + 12, getSpelling)
@@ -83,6 +84,7 @@ case class MinorScale(root: Pitch) extends Key {
     case ScaleDegree.V => Pitch(root.toPitchNumber + 7, getSpelling)
     case ScaleDegree.Vb => Pitch(root.toPitchNumber + 6, Flats)
     case ScaleDegree.VI => Pitch(root.toPitchNumber + 8, getSpelling)
+    case ScaleDegree.VIb => Pitch(root.toPitchNumber + 8, Flats)
     case ScaleDegree.VII => Pitch(root.toPitchNumber + 10, getSpelling)
     case ScaleDegree.VIIb => Pitch(root.toPitchNumber + 10, Flats)
     case ScaleDegree.VIII => Pitch(root.toPitchNumber + 12, getSpelling)

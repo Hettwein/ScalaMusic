@@ -92,7 +92,7 @@ object Pitch {
 
   private val r = """([a-g,A-G])(isis|is|eses|ses|es|s|[n|#|x|X|\-|_]?)([,|']*)""".r
 
-  private val midi = Map(
+  private val midi = Map(//
     (0, Sharps) -> "Bis",
     (0, Sharps) -> "C",
     (0, Flats) -> "C",

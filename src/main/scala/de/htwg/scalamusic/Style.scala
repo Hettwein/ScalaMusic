@@ -20,7 +20,7 @@ object Rock extends Style {
     0 -> Seq((I, Beat(3, 8)), (I, Beat(1, 8)), (I, Beat(1, 2))))
 }
 
-object Funk extends Style {//http://www.bassplayer.com/styles/1181/what-the-funk/25901
+object Funk extends Style { //http://www.bassplayer.com/styles/1181/what-the-funk/25901
   import ScaleDegree._
   val name: String = "funk"
   val pattern = Map(
@@ -40,13 +40,43 @@ object Jazz extends Style {
   val name: String = "jazz"
   val pattern = Map(
     0 -> Seq((I, Beat(1, 4))),
-    1 -> Seq((I, Beat(1, 4)), (III, Beat(1, 4)), (V, Beat(1, 4)), (VI, Beat(1, 4))),
-    2 -> Seq((VIII, Beat(1, 4)), (VI, Beat(1, 4)), (V, Beat(1, 4)), (III, Beat(1, 4))),
-    3 -> Seq((I, Beat(1, 4)), (III, Beat(1, 4)), (V, Beat(1, 4)), (VI, Beat(1, 4)), (VIII, Beat(1, 4)), (VI, Beat(1, 4)), (V, Beat(1, 4)), (III, Beat(1, 4))),
-    4 -> Seq((VIII, Beat(1, 4)), (VII, Beat(1, 4)), (VI, Beat(1, 4)), (V, Beat(1, 4))))
+    1 -> Seq((I, Beat(1, 4)), (I, Beat(1, 4)), (V, Beat(1, 4)), (V, Beat(1, 4))),
+    2 -> Seq((I, Beat(1, 4)), (II, Beat(1, 4)), (III, Beat(1, 4)), (I, Beat(1, 4))),
+    3 -> Seq((I, Beat(1, 4)), (III, Beat(1, 4)), (V, Beat(1, 4)), (III, Beat(1, 4))),
+    4 -> Seq((I, Beat(1, 4)), (II, Beat(1, 4)), (I, Beat(1, 4)), (V, Beat(1, 4))),
+    5 -> Seq((I, Beat(1, 4)), (V, Beat(1, 4)), (III, Beat(1, 4)), (I, Beat(1, 4))),
+    6 -> Seq((VIII, Beat(1, 4)), (V, Beat(1, 4)), (III, Beat(1, 4)), (I, Beat(1, 4))),
+    7 -> Seq((VIII, Beat(1, 4)), (VIII, Beat(1, 4)), (V, Beat(1, 4)), (III, Beat(1, 4))),
+    8 -> Seq((I, Beat(1, 4)), (II, Beat(1, 4)), (III, Beat(1, 4)), (V, Beat(1, 4))),
+    9 -> Seq((VIII, Beat(1, 4)), (VII, Beat(1, 4)), (VI, Beat(1, 4)), (V, Beat(1, 4))),
+    10 -> Seq((I, Beat(1, 4)), (V, Beat(1, 4)), (VIII, Beat(1, 4)), (V, Beat(1, 4))),
+    11 -> Seq((IV, Beat(1, 4)), (III, Beat(1, 4)), (II, Beat(1, 4)), (I, Beat(1, 4))),
+    12 -> Seq((I, Beat(1, 4)), (I, Beat(1, 4)), (II, Beat(1, 4)), (I, Beat(1, 4))),
+    13 -> Seq((I, Beat(1, 4)), (III, Beat(1, 4)), (V, Beat(1, 4)), (VIII, Beat(1, 4))),
+    14 -> Seq((I, Beat(1, 4)), (V, Beat(1, 4)), (VII, Beat(1, 4)), (VIII, Beat(1, 4))),
+    15 -> Seq((VIII, Beat(1, 4)), (V, Beat(1, 4)), (III, Beat(1, 4)), (V, Beat(1, 4))),
+    16 -> Seq((I, Beat(1, 4)), (I, Beat(1, 4)), (V, Beat(1, 4)), (I, Beat(1, 4))),
+    17 -> Seq((VIII, Beat(1, 4)), (V, Beat(1, 4)), (I, Beat(1, 4)), (III, Beat(1, 4))))
 
   val fill = Map(
-    0 -> Seq((VIII, Beat(1, 4)), (VI, Beat(1, 4)), (V, Beat(1, 4)), (III, Beat(1, 4))))
+    0 -> Seq((I, Beat(1, 4))),
+    1 -> Seq((I, Beat(1, 4)), (I, Beat(1, 4)), (V, Beat(1, 4)), (V, Beat(1, 4))),
+    2 -> Seq((I, Beat(1, 4)), (II, Beat(1, 4)), (III, Beat(1, 4)), (I, Beat(1, 4))),
+    3 -> Seq((I, Beat(1, 4)), (III, Beat(1, 4)), (V, Beat(1, 4)), (III, Beat(1, 4))),
+    4 -> Seq((I, Beat(1, 4)), (II, Beat(1, 4)), (I, Beat(1, 4)), (V, Beat(1, 4))),
+    5 -> Seq((I, Beat(1, 4)), (V, Beat(1, 4)), (III, Beat(1, 4)), (I, Beat(1, 4))),
+    6 -> Seq((VIII, Beat(1, 4)), (V, Beat(1, 4)), (III, Beat(1, 4)), (I, Beat(1, 4))),
+    7 -> Seq((VIII, Beat(1, 4)), (VIII, Beat(1, 4)), (V, Beat(1, 4)), (III, Beat(1, 4))),
+    8 -> Seq((I, Beat(1, 4)), (II, Beat(1, 4)), (III, Beat(1, 4)), (V, Beat(1, 4))),
+    9 -> Seq((VIII, Beat(1, 4)), (VII, Beat(1, 4)), (VI, Beat(1, 4)), (V, Beat(1, 4))),
+    10 -> Seq((I, Beat(1, 4)), (V, Beat(1, 4)), (VIII, Beat(1, 4)), (V, Beat(1, 4))),
+    11 -> Seq((IV, Beat(1, 4)), (III, Beat(1, 4)), (II, Beat(1, 4)), (I, Beat(1, 4))),
+    12 -> Seq((I, Beat(1, 4)), (I, Beat(1, 4)), (II, Beat(1, 4)), (I, Beat(1, 4))),
+    13 -> Seq((I, Beat(1, 4)), (III, Beat(1, 4)), (V, Beat(1, 4)), (VIII, Beat(1, 4))),
+    14 -> Seq((I, Beat(1, 4)), (V, Beat(1, 4)), (VII, Beat(1, 4)), (VIII, Beat(1, 4))),
+    15 -> Seq((VIII, Beat(1, 4)), (V, Beat(1, 4)), (III, Beat(1, 4)), (V, Beat(1, 4))),
+    16 -> Seq((I, Beat(1, 4)), (I, Beat(1, 4)), (V, Beat(1, 4)), (I, Beat(1, 4))),
+    17 -> Seq((VIII, Beat(1, 4)), (V, Beat(1, 4)), (I, Beat(1, 4)), (III, Beat(1, 4))))
 }
 
 object SlowRock extends Style {
