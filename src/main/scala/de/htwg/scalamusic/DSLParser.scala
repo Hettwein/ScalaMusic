@@ -12,11 +12,30 @@ package object parser {
     var lastClef: Clef.Value = Clef.treble
     var lastTempo: Int = 105
 
+    def digit: Parser[String] = """(0|1|2|3|4|5|6|7|8|9)""".r ^^ {
+      case d => d
+    }
+
+    def quantity: Parser[Int] = rep1(digit) ^^ {
+      case q => q.foldLeft("")((x, y) => x + y).toInt
+    }
+
+    def duration: Parser[Duration] = """(1|2|4|8|16|32)""".r ~ opt(".") ~ opt(rep1(("~" ~ opt("|")) ~> (element))) ^^ { //tuplet
+      case d ~ None ~ None => Duration(1, d.toInt)
+      case d ~ Some(a) ~ None => Duration(3, 2 * d.toInt)
+      case d ~ None ~ Some(tn) => Duration(1, d.toInt, tn(0).duration)
+      case d ~ Some(a) ~ Some(tn) => Duration(3, 2 * d.toInt, tn(0).duration)
+    }
+
+    def element: Parser[MusicElement] = (note | rest | chordName | tuplet) ^^ {
+      case e => e
+    }
+
     def pitchClass: Parser[PitchClass.Value] = """([a-g,A-G])""".r ^^ {
       PitchClass(_)
     }
 
-    def pitchDecorator: Parser[PitchDecorator.Value] = """(isis|is|eses|ses|es|s|[n|#|x|X|\-]?)""".r ^^ {
+    def pitchDecorator: Parser[PitchDecorator.Value] = """(isis|is|eses|ses|es|s)""".r ^^ {
       PitchDecorator(_)
     }
 
@@ -28,65 +47,35 @@ package object parser {
       case c ~ d ~ o => Pitch(c, d.getOrElse(PitchDecorator.Blank), o.getOrElse(0))
     }
 
-    def note: Parser[Note] = pitch ~ """([\d])""".r ~ opt(".") ~ opt(rep1(("~" ~ opt("|")) ~> note)) ^^ {
-      case p ~ b ~ Some(a) ~ None =>
-        Note(p, Beat(3, 2 * b.toInt))
-      case p ~ b ~ None ~ None =>
-        Note(p, Beat(1, b.toInt))
-      case p ~ b ~ Some(a) ~ Some(tn) =>
-        Note(p, Beat(3, 2 * b.toInt, tn(0).duration))
-      case p ~ b ~ None ~ Some(tn) =>
-        Note(p, Beat(1, b.toInt, tn(0).duration))
+    def note: Parser[Note] = pitch ~ duration ^^ {
+      case p ~ d => Note(p, d)
     }
 
-    // evtl ähnlich wie tied
-    //    def tuplet: Parser[Seq[MusicElement]] = opt("(") ~> (rep1(note | rest | chordName) <~ opt(")")) ~ """([\d])""".r ^^ {
-    //      case m ~ d => for (i <- 0 until m.size) yield {
-    //        if (m(i).isInstanceOf[Note]) {
-    //          m(i).asInstanceOf[Note].copy(tuplet = d.toInt, tupletNum = if(i==0) 1 else if(i == m.size - 1) 2 else 0)
-    //        } else if (m(i).isInstanceOf[Rest]) {
-    //          m(i).asInstanceOf[Rest].copy(tuplet = d.toInt, tupletNum = if(i==0) 1 else if(i == m.size - 1) 2 else 0)
-    //        } else {
-    //          m(i).asInstanceOf[Chord].copy(tuplet = d.toInt, tupletNum = if(i==0) 1 else if(i == m.size - 1) 2 else 0)
-    //        }
-    //      }
-    //    }
-
-    //    def tuplet: Parser[MusicElement] = (note | rest | chordName) ~ ("(" ~> rep1(note | rest | chordName) <~ ")") ~ """([\d])""".r ^^ {
-    //      case e ~ t ~ n =>
-    //        val tup = (n.toInt, t.map { x => x.asInstanceOf[MusicElement] })
-    //        if (e.isInstanceOf[Note]) e.asInstanceOf[Note].copy(tuplet = tup)
-    //        else if (e.isInstanceOf[Rest]) e.asInstanceOf[Rest].copy(tuplet = tup)
-    //        else e.asInstanceOf[Chord].copy(tuplet = tup)
-    //    }
-    def tuplet: Parser[Tuplet] = "{" ~> (rep1(note | rest | chordName | tuplet) <~ "}") ~ """([\d])""".r ^^ { //tied ?, tuplet ?
+    def tuplet: Parser[Tuplet] = "{" ~> (rep1(element) <~ "}") ~ quantity ^^ { // ?
       case m ~ d => Tuplet(d.toInt, m)
     }
 
-    def rest: Parser[Rest] = """([r,R])""".r ~ """([\d])""".r ^^ {
-      case r ~ b => Rest(Beat(1, b.toInt))
+    def rest: Parser[Rest] = """(r|R)""".r ~> duration ^^ {
+      case d => Rest(d)
     }
 
     def chordQuality: Parser[ChordQuality.Value] = """(min|.7|.6|.5|dim|aug|M7|m7|.sus4|.sus2|.9|M|m)?""".r ^^ {
       ChordQuality(_)
     }
 
-    def chordName: Parser[Chord] = pitch ~ chordQuality ~ ":" ~ """([\d]?)""".r ~ opt(".") ~ opt(rep1(("~" ~ opt("|")) ~> chordName)) ^^ {
-      case p ~ q ~ ":" ~ d ~ Some(a) ~ None => Chord(p, q, Beat(3, 2 * d.toInt))
-      case p ~ q ~ ":" ~ d ~ None ~ None => Chord(p, q, Beat(1, d.toInt))
-      case p ~ q ~ ":" ~ d ~ Some(a) ~ Some(tc) => Chord(p, q, Beat(3, 2 * d.toInt, tc(0).duration))
-      case p ~ q ~ ":" ~ d ~ None ~ Some(tc) => Chord(p, q, Beat(1, d.toInt, tc(0).duration))
+    def chordName: Parser[Chord] = pitch ~ chordQuality ~ ":" ~ duration ^^ {
+      case p ~ q ~ ":" ~ d => Chord(p, q, d)
     }
 
-    def tempo: Parser[Int] = "tempo" ~> """([\d]*)""".r ^^ {
+    def tempo: Parser[Int] = "tempo" ~> quantity ^^ {
       case t => t.toInt
     }
 
-    def partial: Parser[Int] = "partial" ~> """([\d]*)""".r ^^ {
-      case p => p.toInt
+    def partial: Parser[Duration] = "partial" ~> duration ^^ {
+      case p => p
     }
 
-    def measure: Parser[Measure] = opt("|") ~> opt(timeSignature) ~ opt(key) ~ opt(clef) ~ opt(tempo) ~ opt(partial) ~ rep1(note | rest | chordName | tuplet) <~ opt("|") ^^ {
+    def measure: Parser[Measure] = opt("|") ~> opt(timeSignature) ~ opt(key) ~ opt(clef) ~ opt(tempo) ~ opt(partial) ~ rep1(element) <~ opt("|") ^^ {
       case None ~ None ~ None ~ None ~ None ~ m => Measure(lastTime, lastKey, lastClef, lastTempo, m.flatten)
       case Some(t) ~ None ~ None ~ None ~ None ~ m =>
         lastTime = t; Measure(t, lastKey, lastClef, lastTempo, m.flatten, timeChange = true)
@@ -165,7 +154,7 @@ package object parser {
       case Some(i) ~ m => ChordProgression(m, i)
     }
 
-    def key: Parser[Key] = "key" ~> pitch ~ opt("""([m])""".r) ^^ {
+    def key: Parser[Key] = "key" ~> pitch ~ opt("m") ^^ {
       case p ~ Some(m) => MinorScale(p)
       case p ~ None => MajorScale(p)
     }
@@ -178,7 +167,7 @@ package object parser {
       case m => Staff(m)
     }
 
-    def timeSignature: Parser[TimeSignature] = """(\d)""".r ~ "/" ~ """(\d)""".r ^^ {
+    def timeSignature: Parser[TimeSignature] = quantity ~ "/" ~ quantity ^^ {
       case d ~ "/" ~ n => TimeSignature(d.toInt, n.toInt)
     }
 
@@ -188,6 +177,9 @@ package object parser {
         case "rock" => Rock
         case "funk" => Funk
         case "slowRock" => SlowRock
+        case "swing" => Swing
+        case "reggae" => Reggae
+        case "boogie" => Boogie
       }
     }
 
@@ -219,7 +211,7 @@ package object parser {
       import java.io._
       import sys.process._
 
-//      val path = new File(getClass.getResource("").getPath).getParentFile.getParentFile.getParentFile.getParentFile.getParent + "/lilypond-output"
+      val path = new File(getClass.getResource("").getPath).getParentFile.getParentFile.getParentFile.getParentFile.getParent + "/lilypond-output"
 //      val fileName = s"rc-${System.currentTimeMillis()}"
 //      val bw = new BufferedWriter(new FileWriter(path + "/" + fileName + ".ly"))
 //      bw.write(generateLy(m))

@@ -11,6 +11,6 @@ trait MusicConversion {
 trait MusicSegment extends MusicConversion
 
 trait MusicElement extends MusicConversion with Traversable[MusicElement] {
-  val duration: Beat
+  val duration: Duration
   def foreach[U](f: MusicElement => U) = f(this)
 }

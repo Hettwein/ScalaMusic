@@ -1,15 +1,15 @@
 package de.htwg.scalamusic
 
-case class Note(pitch: Pitch = Pitch(), duration: Beat = Beat(), velocity: Int = 70) extends MusicElement {
+case class Note(pitch: Pitch = Pitch(), duration: Duration = Duration(), velocity: Int = 70) extends MusicElement {
 
   override def asLy(): String = {
     val p = pitch.toString().toLowerCase()
-    val t = duration.getTied.foldLeft("")((s, b) => s + "~ " + p + (if (b.numerator == 1) b.denominator else b.denominator / 2 + ".")) + " "
-    s"""${p}${if (duration.numerator == 1) duration.denominator else duration.denominator / 2 + "."}${if (t.isEmpty) "" else t}"""
+    val t = duration.getTied.foldLeft("")((s, b) => s + "~ " + p + b.asLy) + " "
+    p + duration.asDSL + t
   }
   override def asDSL(): String = {
     val p = pitch.toString().toLowerCase()
-    val t = duration.getTied.foldLeft("")((s, b) => s + "~ " + p + (if (b.numerator == 1) b.denominator else b.denominator / 2 + ".")) + " "
-    s"""${p}${if (duration.numerator == 1) duration.denominator else duration.denominator / 2 + "."}${if (t.isEmpty) "" else t}"""
+    val t = duration.getTied.foldLeft("")((s, b) => s + "~ " + p + b.asDSL) + " "
+    p + duration.asDSL + t
   }
 }

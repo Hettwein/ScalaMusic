@@ -18,12 +18,13 @@ trait HasKeySignatureSpelling {
 
 trait Key extends MusicConversion with HasKeySignatureSpelling {
   def getDegreePitch(d: ScaleDegree.Value): Pitch
+// getPentatonicScale
+  
+//  val scale: Seq[Pitch] = ScaleDegree.values.toSeq.map { x => getDegreePitch(x) }
 
-  val scale: Seq[Pitch] = ScaleDegree.values.toSeq.map { x => getDegreePitch(x) }
-
-  def getDegreeIndex(p: Pitch): Int = { val idx = scale.indexOf(p); if (idx != -1) idx else if (getSpelling == KeySignatureSpelling.Flats) scale.indexOf(p.chromaticUp(getSpelling)) else scale.indexOf(p.chromaticDown(getSpelling)) }
-  def stepUp(from: Pitch): Pitch = { val idx = scale.indexOf(from); if (idx < 6) scale(idx + 1) else scale(idx - 6)+ }
-  def stepDown(from: Pitch): Pitch = { val idx = scale.indexOf(from); if (idx > 0) scale(idx - 1) else scale(idx + 6)- }
+//  def getDegreeIndex(p: Pitch): Int = { val idx = scale.indexOf(p); if (idx != -1) idx else if (getSpelling == KeySignatureSpelling.Flats) scale.indexOf(p.chromaticUp(getSpelling)) else scale.indexOf(p.chromaticDown(getSpelling)) }
+//  def stepUp(from: Pitch): Pitch = { val idx = scale.indexOf(from); if (idx < 6) scale(idx + 1) else scale(idx - 6)+ }
+//  def stepDown(from: Pitch): Pitch = { val idx = scale.indexOf(from); if (idx > 0) scale(idx - 1) else scale(idx + 6)- }
 }
 
 case class MajorScale(root: Pitch) extends Key {

@@ -24,5 +24,5 @@ case class Score(style: Style, music: Seq[Staff] = Seq()) extends MusicConversio
                               |  }
                               |}
                               |}""".stripMargin
-  override def asDSL: String = s"""( style '${style}' ${music.foldLeft("")((s, m) => s + m.asDSL + " ")})"""
+  override def asDSL: String = s"""( ${style.asDSL}${music.foldLeft("")((s, m) => s + m.asDSL + " ")})"""
 }

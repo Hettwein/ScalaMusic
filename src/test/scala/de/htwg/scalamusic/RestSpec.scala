@@ -10,13 +10,13 @@ import org.scalatest.junit.JUnitRunner
 class RestSpec extends WordSpec with Matchers {
   "Rests" should {
     "have a duration" in {
-      Note(duration = Beat(1, 1)).duration should be(Beat(1, 1))
+      Note(duration = Duration(1, 1)).duration should be(Duration(1, 1))
     }
     "have a DSL representation" in {
-      Rest(Beat(1, 2)).asDSL should be("r2")
+      Rest(Duration(1, 2)).asDSL should be("r2")
     }
     "have a LilyPond representation" in {
-      Rest(Beat(1, 2)).asLy should be("r2")
+      Rest(Duration(1, 2)).asLy should be("r2")
     }
   }
 }
