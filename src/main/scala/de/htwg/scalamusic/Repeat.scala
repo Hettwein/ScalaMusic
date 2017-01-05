@@ -1,8 +1,8 @@
 package de.htwg.scalamusic
 
-case class Repeat(music: Seq[MusicSegment], alternatives: Seq[Seq[Measure]] = Seq()) extends MusicSegment {
+class Repeat(val music: Seq[Repeat] = Seq(), val alternatives: Seq[Seq[Measure]] = Seq()) extends MusicConversion {
 
-  override def asLy(): String = s"""\\repeat volta ${"2"} {${music.foldLeft("")((s, m) => s + m.asLy + " ")}}
+  override def asLy(): String = s"""\\repeat volta ${if(alternatives.size < 2) "2" else alternatives.size} {${music.foldLeft("")((s, m) => s + m.asLy + " ")}}
                                     |      \\alternative {
                                     |        ${alternatives.foldLeft("")((s, m) => s + "{" + m.foldLeft("")((s, m) => s + m.asLy + " ") + "}")}
                                     |      }"""

@@ -11,8 +11,8 @@ case class Pitch(pitchClass: PitchClass.Value = PitchClass.C, decorator: PitchDe
   def + = copy(octave = octave + 1)
   def - = copy(octave = octave - 1)
 
-  def chromaticUp(sign: KeySignatureSpelling.Value) = Pitch((Pitch.midi(this.toPitchNumber + 1, sign)))
-  def chromaticDown(sign: KeySignatureSpelling.Value) = Pitch((Pitch.midi(this.toPitchNumber - 1, sign)))
+//  def chromaticUp(sign: KeySignatureSpelling.Value) = Pitch((Pitch.midi(this.toPitchNumber + 1, sign)))
+//  def chromaticDown(sign: KeySignatureSpelling.Value) = Pitch((Pitch.midi(this.toPitchNumber - 1, sign)))
 
   override def toString: String = {
     var octaves = "";
@@ -90,7 +90,7 @@ object Pitch {
   import PitchDecorator._
   import KeySignatureSpelling._
 
-  private val r = """([a-g,A-G])(isis|is|eses|ses|es|s|[n|#|x|X|\-|_]?)([,|']*)""".r
+  private val r = """([a-g,A-G])(isis|is|eses|ses|es|s|)([,|']*)""".r
 
   private val midi = Map( //
     (0, Sharps) -> "Bis",

@@ -1,6 +1,6 @@
 package de.htwg.scalamusic
 
-case class Note(pitch: Pitch = Pitch(), duration: Duration = Duration(), velocity: Int = 70) extends MusicElement {
+case class Note(pitch: Pitch = Pitch(), duration: Duration = Duration(), volume: Int = 70) extends MusicElement {
 
   override def asLy(): String = {
     val p = pitch.toString().toLowerCase()

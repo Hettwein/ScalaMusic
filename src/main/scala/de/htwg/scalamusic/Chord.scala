@@ -3,7 +3,7 @@ package de.htwg.scalamusic
 import de.htwg.scalamusic._
 import scala.language.postfixOps
 
-case class Chord(root: Pitch = Pitch(), quality: ChordQuality.Value = ChordQuality.Major, duration: Duration = Duration(1, 1), velocity: Int = 70) extends MusicElement {
+case class Chord(root: Pitch = Pitch(), quality: ChordQuality.Value = ChordQuality.Major, duration: Duration = Duration(1, 1), volume: Int = 70) extends MusicElement {
   //umkehrungen??
   val music = quality match {
     case ChordQuality.Major =>
@@ -58,7 +58,7 @@ case class Chord(root: Pitch = Pitch(), quality: ChordQuality.Value = ChordQuali
 }
 
 object Chord {
-  def apply(m: Seq[Pitch], duration: Duration, velocity: Int): Chord = {
+  def apply(m: Seq[Pitch], duration: Duration, volume: Int): Chord = {
     // calculate chord quality
     Chord()
   }

@@ -12,11 +12,8 @@ object KeySignatureSpelling extends Enumeration {
   val Mixed, Sharps, Flats = Value
 }
 
-trait HasKeySignatureSpelling {
+trait Key extends MusicConversion {
   def getSpelling: KeySignatureSpelling.Value
-}
-
-trait Key extends MusicConversion with HasKeySignatureSpelling {
   def getDegreePitch(d: ScaleDegree.Value): Pitch
 // getPentatonicScale
   

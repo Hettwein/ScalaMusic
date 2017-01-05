@@ -20,7 +20,7 @@ package object parser {
       case q => q.foldLeft("")((x, y) => x + y).toInt
     }
 
-    def duration: Parser[Duration] = """(1|2|4|8|16|32)""".r ~ opt(".") ~ opt(rep1(("~" ~ opt("|")) ~> (element))) ^^ { //tuplet
+    def duration: Parser[Duration] = """(1|2|4|8|16|32)""".r ~ opt(".") ~ opt(rep1(("~" ~ opt("|")) ~> (element))) ^^ {
       case d ~ None ~ None => Duration(1, d.toInt)
       case d ~ Some(a) ~ None => Duration(3, 2 * d.toInt)
       case d ~ None ~ Some(tn) => Duration(1, d.toInt, tn(0).duration)
@@ -180,6 +180,7 @@ package object parser {
         case "swing" => Swing
         case "reggae" => Reggae
         case "boogie" => Boogie
+        case "soul" => Soul
       }
     }
 

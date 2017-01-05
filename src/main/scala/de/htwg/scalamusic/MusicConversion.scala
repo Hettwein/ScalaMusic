@@ -8,8 +8,6 @@ trait MusicConversion {
   def asDSL: String
 }
 
-trait MusicSegment extends MusicConversion
-
 trait MusicElement extends MusicConversion with Traversable[MusicElement] {
   val duration: Duration
   def foreach[U](f: MusicElement => U) = f(this)
