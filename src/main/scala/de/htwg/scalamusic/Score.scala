@@ -1,6 +1,6 @@
 package de.htwg.scalamusic
 
-case class Score(style: Style, music: Seq[Staff] = Seq()) extends MusicConversion {
+case class Score(style: Style = null, music: Seq[Staff] = Seq()) extends MusicConversion {
   override def asLy: String = s"""\\score {
                               |<<
                               |  ${music.foldLeft("")((s, m) => s + m.asLy + " ")}
@@ -24,5 +24,5 @@ case class Score(style: Style, music: Seq[Staff] = Seq()) extends MusicConversio
                               |  }
                               |}
                               |}""".stripMargin
-  override def asDSL: String = s"""( ${style.asDSL}${music.foldLeft("")((s, m) => s + m.asDSL + " ")})"""
+  override def asDSL: String = s"""( ${if(style != null) style.asDSL else ""}${music.foldLeft("")((s, m) => s + m.asDSL + " ")})"""
 }

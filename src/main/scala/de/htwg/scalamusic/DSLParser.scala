@@ -7,10 +7,11 @@ package object parser {
 
   object DSLParser extends RegexParsers {
 
+    //defaults
     var lastTime: TimeSignature = TimeSignature()
     var lastKey: Key = MajorScale(Pitch())
     var lastClef: Clef.Value = Clef.treble
-    var lastTempo: Int = 105
+    var lastTempo: Int = 100
 
     def digit: Parser[String] = """(0|1|2|3|4|5|6|7|8|9)""".r ^^ {
       case d => d
@@ -184,8 +185,9 @@ package object parser {
       }
     }
 
-    def score: Parser[Score] = opt("(") ~> style ~ rep1(staff) <~ opt(")") ^^ {
-      case s ~ m => Score(s, m)
+    def score: Parser[Score] = opt("(") ~> opt(style) ~ rep1(staff) <~ opt(")") ^^ {
+      case None ~ m => Score(music = m)
+      case Some(s) ~ m => Score(s, m)
     }
 
     def apply(input: String): Score = parseAll(score, input) match {
@@ -212,7 +214,7 @@ package object parser {
       import java.io._
       import sys.process._
 
-      val path = new File(getClass.getResource("").getPath).getParentFile.getParentFile.getParentFile.getParentFile.getParent + "/lilypond-output"
+//      val path = new File(getClass.getResource("").getPath).getParentFile.getParentFile.getParentFile.getParentFile.getParent + "/lilypond-output"
 //      val fileName = s"rc-${System.currentTimeMillis()}"
 //      val bw = new BufferedWriter(new FileWriter(path + "/" + fileName + ".ly"))
 //      bw.write(generateLy(m))

@@ -4,42 +4,44 @@ import scala.language.postfixOps
 
 class BassGenerator(val score: Score) {
 
-  var last: (Double, Seq[Part]) = (0, Seq())
+  var last: Seq[Part] = Seq()
 
   def generate(): Score = {
     val bassline = generate(score.style, extractChords().music)
     score.copy(music = Seq(Staff(score.music(0).music :+ new Voice(bassline, "electric bass (finger)"))))
   }
 
-  def generate(style: Style, segments: Seq[Repeat], n: Int = 0): Seq[Repeat] = {
+  def generate(style: Style, segments: Seq[Repeat]): Seq[Repeat] = {
+    if(style == null) {println("No style selected!"); return Seq()}
     val a = Math.random()
     val b = Math.random()
     for (i <- 0 until segments.size) yield { // iterate over measures/ repeats
       if (segments(i).isInstanceOf[Measure]) {
         val bar = segments(i).asInstanceOf[Measure]
         val d = bar.elements.foldLeft(Duration(0, 1))((n, m) => n.sum(m.duration)).getValue()
-        val music: Seq[MusicElement] = applyPattern(bar.elements /*.asInstanceOf[Seq[Chord]]*/ , bar.timeSignature, getPattern(style, a, b, if (n == 0) i + 1 else n), d)
+        val music: Seq[MusicElement] = applyPattern(bar.elements /*.asInstanceOf[Seq[Chord]]*/ , bar.timeSignature, getPattern(style, a, b), d)
         bar.copy(clef = Clef.bass, elements = music, clefChange = segments(0) == bar)
       } else {
         val rep = segments(i).asInstanceOf[Repeat]
-        new Repeat(generate(style, rep.music), rep.alternatives.map { x => generate(style, x, 4).asInstanceOf[Seq[Measure]] })
+        new Repeat(generate(style, rep.music), rep.alternatives.map { x => if(last.size == 0) generate(style, rep.music ++ x).asInstanceOf[Seq[Measure]].drop(rep.music.size) else generate(style, x).asInstanceOf[Seq[Measure]] })
       }
     }
   }
 
-  def getPattern(style: Style, partA: Double, partB: Double, count: Int): Seq[Part] = {
-    if (last._1 < last._2.size) {
-      last._2.drop(last._1.toInt)
+  def getPattern(style: Style, partA: Double, partB: Double): Seq[Part] = {
+    if (last.size > 0) {
+      last
     } else {
-      if (count % 4 != 0) {
-        if (count % 2 != 0) {
-          style.pattern((partA * (style.pattern.size - 1)).round.toInt)
-        } else {
-          style.pattern((partB * (style.pattern.size - 1)).round.toInt)
-        }
-      } else {
-        style.fill((Math.random() * (style.fill.size - 1)).round.toInt)
-      }
+//      if (count % 4 != 0) {
+//        if (count % 2 != 0) {
+//          style.patternA((partA * (style.patternA.size - 1)).round.toInt)
+//        } else {
+//          style.patternA((partB * (style.patternA.size - 1)).round.toInt)
+//        }
+//      } else {
+//        style.patternB((Math.random() * (style.patternB.size - 1)).round.toInt)
+//      }
+      style.groove((partA * (style.pattern.size - 1)).round.toInt, (partB * (style.pattern.size - 1)).round.toInt, (Math.random() * (style.lick.size - 1)).round.toInt)
     }
   }
 
@@ -48,11 +50,11 @@ class BassGenerator(val score: Score) {
     var d = 0.0
     var n = 0
     var c = 0.0
-    last = (measureLength / duration * pattern.size, pattern)
+    last = pattern
     var triplets = false
-    for (i <- 0 until (measureLength / duration * pattern.size).toInt; if (d < measureLength && ((pattern(i % pattern.size).duration.denominator % 3 == 0 && !triplets) || pattern(i % pattern.size).duration.denominator % 3 != 0))) yield { ////
+    for (i <- 0 until 30/*???*/; if (d < measureLength && ((pattern(i % pattern.size).duration.denominator % 3 == 0 && !triplets) || pattern(i % pattern.size).duration.denominator % 3 != 0))) yield { ////
       val p = pattern(i % pattern.size)
-      c = BigDecimal(c).setScale(7, BigDecimal.RoundingMode.HALF_UP).toDouble //  
+      c = BigDecimal(c).setScale(7, BigDecimal.RoundingMode.HALF_UP).toDouble // 
       if (c >= chords(n).duration.getValue()) {
         c = c - chords(n).duration.getValue()
         n += 1
@@ -67,13 +69,14 @@ class BassGenerator(val score: Score) {
             val e = pattern(j % pattern.size)
             d += e.duration.getValue()
             c += e.duration.getValue()
-            if (c >= chords(n).duration.getValue()) {
+            if (c > chords(n).duration.getValue()) {
               c = c - chords(n).duration.getValue()
               n += 1
             }
             val chord: Chord = chords(n).asInstanceOf[Chord]
             val b = Duration(e.duration.numerator, (e.duration.denominator * 2.0 / 3.0).toInt)
-            if (e.degree != null) m = m :+ Note(chord.getScale.getDegreePitch(e.degree)-, b) else m = m :+ Rest(b)//octave
+            last = last.drop(1)
+            if (e.degree != null) m = m :+ Note(if(e.octave > 0) chord.getScale.getDegreePitch(e.degree) else if(e.octave < 0) chord.getScale.getDegreePitch(e.degree).-.- else chord.getScale.getDegreePitch(e.degree)-, b) else m = m :+ Rest(b)//octave
             j += 1
           }
           Tuplet(3, m)
@@ -81,9 +84,11 @@ class BassGenerator(val score: Score) {
           triplets = false
           d += p.duration.getValue()
           c += p.duration.getValue()
-          if (p.degree != null && chord != null) Note(chord.getScale.getDegreePitch(p.degree)-, p.duration) else Rest(p.duration)//octave
+          last = last.drop(1)
+          if (p.degree != null && chord != null) Note(if(p.octave > 0) chord.getScale.getDegreePitch(p.degree) else if(p.octave < 0) chord.getScale.getDegreePitch(p.degree).-.- else chord.getScale.getDegreePitch(p.degree)-, p.duration) else Rest(p.duration)//octave
         }
       } else {//no chord ?
+        println("????????????????????")
         d += chords(n).duration.getValue()
         c += chords(n).duration.getValue()
         chords(n)
