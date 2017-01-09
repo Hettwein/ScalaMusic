@@ -12,6 +12,12 @@ package object parser {
     var lastKey: Key = MajorScale(Pitch())
     var lastClef: Clef.Value = Clef.treble
     var lastTempo: Int = 100
+    var setDefaultTempo: Boolean = true
+    def startTempo: Boolean = {
+      val tmp = setDefaultTempo
+      setDefaultTempo = false
+      tmp
+    }
 
     def digit: Parser[String] = """(0|1|2|3|4|5|6|7|8|9)""".r ^^ {
       case d => d
@@ -77,60 +83,60 @@ package object parser {
     }
 
     def measure: Parser[Measure] = opt("|") ~> opt(timeSignature) ~ opt(key) ~ opt(clef) ~ opt(tempo) ~ opt(partial) ~ rep1(element) <~ opt("|") ^^ {
-      case None ~ None ~ None ~ None ~ None ~ m => Measure(lastTime, lastKey, lastClef, lastTempo, m.flatten)
+      case None ~ None ~ None ~ None ~ None ~ m => Measure(lastTime, lastKey, lastClef, lastTempo, m.flatten, tempoChange = startTempo)
       case Some(t) ~ None ~ None ~ None ~ None ~ m =>
-        lastTime = t; Measure(t, lastKey, lastClef, lastTempo, m.flatten, timeChange = true)
+        lastTime = t; Measure(t, lastKey, lastClef, lastTempo, m.flatten, timeChange = true, tempoChange = startTempo)
       case Some(t) ~ Some(k) ~ None ~ None ~ None ~ m =>
-        lastTime = t; lastKey = k; Measure(t, k, lastClef, lastTempo, m.flatten, timeChange = true, keyChange = true)
+        lastTime = t; lastKey = k; Measure(t, k, lastClef, lastTempo, m.flatten, timeChange = true, keyChange = true, tempoChange = startTempo)
       case Some(t) ~ None ~ Some(c) ~ None ~ None ~ m =>
-        lastTime = t; lastClef = c; Measure(t, lastKey, c, lastTempo, m.flatten, timeChange = true, clefChange = true)
+        lastTime = t; lastClef = c; Measure(t, lastKey, c, lastTempo, m.flatten, timeChange = true, clefChange = true, tempoChange = startTempo)
       case Some(t) ~ None ~ None ~ Some(s) ~ None ~ m =>
         lastTime = t; lastTempo = s; Measure(t, lastKey, lastClef, s, m.flatten, timeChange = true, tempoChange = true)
       case Some(t) ~ Some(k) ~ Some(c) ~ None ~ None ~ m =>
-        lastTime = t; lastKey = k; lastClef = c; Measure(t, k, c, lastTempo, m.flatten, timeChange = true, keyChange = true, clefChange = true)
+        lastTime = t; lastKey = k; lastClef = c; Measure(t, k, c, lastTempo, m.flatten, timeChange = true, keyChange = true, clefChange = true, tempoChange = startTempo)
       case Some(t) ~ Some(k) ~ None ~ Some(s) ~ None ~ m =>
         lastTime = t; lastKey = k; lastTempo = s; Measure(t, k, lastClef, s, m.flatten, keyChange = true, tempoChange = true)
       case Some(t) ~ Some(k) ~ Some(c) ~ Some(s) ~ None ~ m =>
         lastTime = t; lastKey = k; lastClef = c; lastTempo = s; Measure(t, k, c, s, m.flatten, timeChange = true, keyChange = true, clefChange = true, tempoChange = true)
       case None ~ Some(k) ~ None ~ None ~ None ~ m =>
-        lastKey = k; Measure(lastTime, k, lastClef, lastTempo, m.flatten, keyChange = true)
+        lastKey = k; Measure(lastTime, k, lastClef, lastTempo, m.flatten, keyChange = true, tempoChange = startTempo)
       case None ~ Some(k) ~ Some(c) ~ None ~ None ~ m =>
-        lastKey = k; lastClef = c; Measure(lastTime, k, c, lastTempo, m.flatten, keyChange = true, clefChange = true)
+        lastKey = k; lastClef = c; Measure(lastTime, k, c, lastTempo, m.flatten, keyChange = true, clefChange = true, tempoChange = startTempo)
       case None ~ Some(k) ~ None ~ Some(s) ~ None ~ m =>
         lastKey = k; lastTempo = s; Measure(lastTime, k, lastClef, s, m.flatten, keyChange = true, tempoChange = true)
       case None ~ Some(k) ~ Some(c) ~ Some(s) ~ None ~ m =>
         lastKey = k; lastClef = c; lastTempo = s; Measure(lastTime, k, c, s, m.flatten, keyChange = true, clefChange = true, tempoChange = true)
       case None ~ None ~ Some(c) ~ None ~ None ~ m =>
-        lastClef = c; Measure(lastTime, lastKey, c, lastTempo, m.flatten, clefChange = true)
+        lastClef = c; Measure(lastTime, lastKey, c, lastTempo, m.flatten, clefChange = true, tempoChange = startTempo)
       case None ~ None ~ Some(c) ~ Some(s) ~ None ~ m =>
         lastClef = c; lastTempo = s; Measure(lastTime, lastKey, c, s, m.flatten, clefChange = true, tempoChange = true)
       case None ~ None ~ None ~ Some(s) ~ None ~ m =>
         lastTempo = s; Measure(lastTime, lastKey, lastClef, s, m.flatten, tempoChange = true)
-      case None ~ None ~ None ~ None ~ Some(p) ~ m => Measure(lastTime, lastKey, lastClef, lastTempo, m.flatten, p)
+      case None ~ None ~ None ~ None ~ Some(p) ~ m => Measure(lastTime, lastKey, lastClef, lastTempo, m.flatten, p, tempoChange = startTempo)
       case Some(t) ~ None ~ None ~ None ~ Some(p) ~ m =>
-        lastTime = t; Measure(t, lastKey, lastClef, lastTempo, m.flatten, p, timeChange = true)
+        lastTime = t; Measure(t, lastKey, lastClef, lastTempo, m.flatten, p, timeChange = true, tempoChange = startTempo)
       case Some(t) ~ Some(k) ~ None ~ None ~ Some(p) ~ m =>
-        lastTime = t; lastKey = k; Measure(t, k, lastClef, lastTempo, m.flatten, p, timeChange = true, keyChange = true)
+        lastTime = t; lastKey = k; Measure(t, k, lastClef, lastTempo, m.flatten, p, timeChange = true, keyChange = true, tempoChange = startTempo)
       case Some(t) ~ None ~ Some(c) ~ None ~ Some(p) ~ m =>
-        lastTime = t; lastClef = c; Measure(t, lastKey, c, lastTempo, m.flatten, p, timeChange = true, clefChange = true)
+        lastTime = t; lastClef = c; Measure(t, lastKey, c, lastTempo, m.flatten, p, timeChange = true, clefChange = true, tempoChange = startTempo)
       case Some(t) ~ None ~ None ~ Some(s) ~ Some(p) ~ m =>
         lastTime = t; lastTempo = s; Measure(t, lastKey, lastClef, s, m.flatten, p, timeChange = true, tempoChange = true)
       case Some(t) ~ Some(k) ~ Some(c) ~ None ~ Some(p) ~ m =>
-        lastTime = t; lastKey = k; lastClef = c; Measure(t, k, c, lastTempo, m.flatten, p, timeChange = true, keyChange = true, clefChange = true)
+        lastTime = t; lastKey = k; lastClef = c; Measure(t, k, c, lastTempo, m.flatten, p, timeChange = true, keyChange = true, clefChange = true, tempoChange = startTempo)
       case Some(t) ~ Some(k) ~ None ~ Some(s) ~ Some(p) ~ m =>
         lastTime = t; lastKey = k; lastTempo = s; Measure(t, k, lastClef, s, m.flatten, p, timeChange = true, keyChange = true, tempoChange = true)
       case Some(t) ~ Some(k) ~ Some(c) ~ Some(s) ~ Some(p) ~ m =>
         lastTime = t; lastClef = c; lastTempo = s; Measure(t, k, c, s, m.flatten, p, timeChange = true, keyChange = true, clefChange = true, tempoChange = true)
       case None ~ Some(k) ~ None ~ None ~ Some(p) ~ m =>
-        lastKey = k; Measure(lastTime, k, lastClef, lastTempo, m.flatten, p, keyChange = true)
+        lastKey = k; Measure(lastTime, k, lastClef, lastTempo, m.flatten, p, keyChange = true, tempoChange = startTempo)
       case None ~ Some(k) ~ Some(c) ~ None ~ Some(p) ~ m =>
-        lastKey = k; lastClef = c; Measure(lastTime, k, c, lastTempo, m.flatten, p, keyChange = true, clefChange = true)
+        lastKey = k; lastClef = c; Measure(lastTime, k, c, lastTempo, m.flatten, p, keyChange = true, clefChange = true, tempoChange = startTempo)
       case None ~ Some(k) ~ None ~ Some(s) ~ Some(p) ~ m =>
         lastKey = k; lastTempo = s; Measure(lastTime, k, lastClef, s, m.flatten, p, keyChange = true, tempoChange = true)
       case None ~ Some(k) ~ Some(c) ~ Some(s) ~ Some(p) ~ m =>
         lastKey = k; lastClef = c; lastTempo = s; Measure(lastTime, k, c, s, m.flatten, p, keyChange = true, clefChange = true, tempoChange = true)
       case None ~ None ~ Some(c) ~ None ~ Some(p) ~ m =>
-        lastClef = c; Measure(lastTime, lastKey, c, lastTempo, m.flatten, p, clefChange = true)
+        lastClef = c; Measure(lastTime, lastKey, c, lastTempo, m.flatten, p, clefChange = true, tempoChange = startTempo)
       case None ~ None ~ Some(c) ~ Some(s) ~ Some(p) ~ m =>
         lastClef = c; lastTempo = s; Measure(lastTime, lastKey, c, s, m.flatten, p, clefChange = true, tempoChange = true)
       case None ~ None ~ None ~ Some(s) ~ Some(p) ~ m => lastTempo = s; Measure(lastTime, lastKey, lastClef, s, m.flatten, p, tempoChange = true)
@@ -221,13 +227,13 @@ package object parser {
 //      bw.close()
 //
 //      val resultLy = Process("lilypond --pdf " + fileName + ".ly", new File(path)).!!
-            //val path = new File(getClass.getResource("").getPath).getParentFile.getParentFile.getParentFile.getParentFile.getParent + "/lilypond-output"
-            val fileName = s"rc-${System.currentTimeMillis()}"
-            val bw = new BufferedWriter(new FileWriter( /*/path + "/" + */ fileName + ".ly"))
-          		  bw.write(generateLy(m))
-          		  bw.close()
-          		  
-          		  val resultLy = Process("lilypond --pdf " + fileName + ".ly" /*, new File(path)*/ ).!!
+                  //val path = new File(getClass.getResource("").getPath).getParentFile.getParentFile.getParentFile.getParentFile.getParent + "/lilypond-output"
+                  val fileName = s"rc-${System.currentTimeMillis()}"
+                  val bw = new BufferedWriter(new FileWriter( /*/path + "/" + */ fileName + ".ly"))
+                		  bw.write(generateLy(m))
+                		  bw.close()
+                		  
+                		  val resultLy = Process("lilypond --pdf " + fileName + ".ly" /*, new File(path)*/ ).!!
       //      println(resultLy)
       //      Process(fileName + ".mid", new File(path)).!!
       //      Process(fileName + ".pdf", new File(path)).!!

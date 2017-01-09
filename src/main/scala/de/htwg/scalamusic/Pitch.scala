@@ -45,8 +45,8 @@ object PitchClass extends Enumeration {
 
   def apply(s: String): PitchClass = withName(s.toUpperCase)
   def toPitchNumber(p: PitchClass): Int = midi(p)
-  def isIn(p: Int): Boolean = midi.map(_.swap).get(p) != None
-  def getClass(p: Int): PitchClass.Value = midi.map(_.swap).get(p).get
+//  def isIn(p: Int): Boolean = midi.map(_.swap).get(p) != None
+//  def getClass(p: Int): PitchClass.Value = midi.map(_.swap).get(p).get
   //  def valueStream = Stream.continually(PitchClass.values).flatten
 }
 
@@ -92,36 +92,20 @@ object Pitch {
 
   private val r = """([a-g,A-G])(isis|is|eses|ses|es|s|)([,|']*)""".r
 
-  private val midi = Map( //
-    (0, Sharps) -> "Bis",
-    (0, Sharps) -> "C",
-    (0, Flats) -> "C",
-    (1, Sharps) -> "Cis",
-    (1, Flats) -> "Des",
-    (2, Sharps) -> "D",
-    (2, Flats) -> "D",
-    (3, Sharps) -> "Dis",
-    (3, Flats) -> "Es",
-    (4, Sharps) -> "E",
-    (4, Flats) -> "E",
-    (4, Flats) -> "Fes",
-    (5, Sharps) -> "Eis",
-    (5, Sharps) -> "F",
-    (5, Flats) -> "F",
-    (6, Sharps) -> "Fis",
-    (6, Flats) -> "Ges",
-    (7, Sharps) -> "G",
-    (7, Flats) -> "G",
-    (8, Sharps) -> "Gis",
-    (8, Flats) -> "As",
-    (9, Sharps) -> "A",
-    (9, Flats) -> "A",
-    (10, Sharps) -> "Ais",
-    (10, Flats) -> "Bes",
-    (11, Sharps) -> "B",
-    (11, Flats) -> "B",
-    (11, Flats) -> "Ces"
-  )
+  private def midi(d: (Int, KeySignatureSpelling.Value, Int)) = d match{
+    case (0, _, _) => if(d._2 == Sharps && d._3 > 6) "Bis" else "C"
+    case (1, _, _) => if(d._2 == Sharps) "Cis" else "Des"
+    case (2, _, _) => "D"
+    case (3, _, _) => if(d._2 == Sharps) "Dis" else "Es"
+    case (4, _, _) => if(d._2 == Flats && d._3 > 5) "Fes" else "E"
+    case (5, _, _) => if(d._2 == Sharps && d._3 > 5) "Eis" else "F"
+    case (6, _, _) => if(d._2 == Sharps) "Fis" else "Ges"
+    case (7, _, _) => "G"
+    case (8, _, _) => if(d._2 == Sharps) "Gis" else "As"
+    case (9, _, _) => "A"
+    case (10, _, _) => if(d._2 == Sharps) "Ais" else "Bes"
+    case (11, _, _) => if(d._2 == Flats && d._3 > 6) "Ces" else "B"
+  }
 
   def apply(s: String): Pitch = s match {
     case r(p) => new Pitch(PitchClass(p), Blank, 0)
@@ -130,14 +114,14 @@ object Pitch {
       o.count(c => (c == ''')) - o.count(c => (c == ',')))
   }
 
-  def apply(i: Int, sign: KeySignatureSpelling.Value): Pitch = {
+  def apply(i: Int, signs: (KeySignatureSpelling.Value, Int)): Pitch = {
     var octaves = "";
     if (i >= 0) {
       octaves = "'" * (i / 12)
     } else {
       octaves = "," * (Math.abs(i - 12) / 12)
     }
-    Pitch((midi(Math.abs((i + 48) % 12), sign) + octaves))
+    Pitch((midi(Math.abs((i + 48) % 12), signs._1, signs._2) + octaves))
   }
 
   //  def apply(pitch: PitchClass.Value): Pitch = new Pitch(pitch, Blank, 0)

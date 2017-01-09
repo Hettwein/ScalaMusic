@@ -19,8 +19,13 @@ class BassGenerator(val score: Score) {
       if (segments(i).isInstanceOf[Measure]) {
         val bar = segments(i).asInstanceOf[Measure]
         val d = bar.elements.foldLeft(Duration(0, 1))((n, m) => n.sum(m.duration)).getValue()
-        val music: Seq[MusicElement] = applyPattern(bar.elements /*.asInstanceOf[Seq[Chord]]*/ , bar.timeSignature, getPattern(style, a, b), d)
-        bar.copy(clef = Clef.bass, elements = music, clefChange = segments(0) == bar)
+        if(bar.partial != null) {
+          //style.partial(bar.partial)
+          bar.copy(clef = Clef.bass, elements = Seq(Rest(bar.partial)), clefChange = segments(0) == bar)
+        } else {
+          val music: Seq[MusicElement] = applyPattern(bar.elements /*.asInstanceOf[Seq[Chord]]*/ , bar.timeSignature, getPattern(style, a, b), d)
+          bar.copy(clef = Clef.bass, elements = music, clefChange = segments(0) == bar)
+        }
       } else {
         val rep = segments(i).asInstanceOf[Repeat]
         new Repeat(generate(style, rep.music), rep.alternatives.map { x => if(last.size == 0) generate(style, rep.music ++ x).asInstanceOf[Seq[Measure]].drop(rep.music.size) else generate(style, x).asInstanceOf[Seq[Measure]] })
@@ -88,7 +93,7 @@ class BassGenerator(val score: Score) {
           if (p.degree != null && chord != null) Note(if(p.octave > 0) chord.getScale.getDegreePitch(p.degree) else if(p.octave < 0) chord.getScale.getDegreePitch(p.degree).-.- else chord.getScale.getDegreePitch(p.degree)-, p.duration) else Rest(p.duration)//octave
         }
       } else {//no chord ?
-        println("????????????????????")
+        //
         d += chords(n).duration.getValue()
         c += chords(n).duration.getValue()
         chords(n)

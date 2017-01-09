@@ -19,14 +19,12 @@ case class Duration(numerator: Int = 1, denominator: Int = 4, tied: Duration = n
 
   def getValue(): Double = numerator.toDouble / denominator.toDouble + (if (tied != null) getTied.foldLeft(Duration(0, 1))((n, b) => n.sum(b)).getValue() else 0)
 
-  def getTied(): Seq[Duration] = {
-    var t: Seq[Duration] = Seq()
-    var b = this
-    while (b.tied != null) {
-      b = b.tied
-      t = t :+ b
+  def getTied(): List[Duration] = {
+    if(tied != null) {
+      List(this) ++ tied.getTied()
+    } else {
+      List()
     }
-    t
   }
 
   def asLy: String = s"""${if (numerator == 1) denominator else denominator / 2 + "."}"""
