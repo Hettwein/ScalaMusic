@@ -11,9 +11,6 @@ case class Pitch(pitchClass: PitchClass.Value = PitchClass.C, decorator: PitchDe
   def + = copy(octave = octave + 1)
   def - = copy(octave = octave - 1)
 
-//  def chromaticUp(sign: KeySignatureSpelling.Value) = Pitch((Pitch.midi(this.toPitchNumber + 1, sign)))
-//  def chromaticDown(sign: KeySignatureSpelling.Value) = Pitch((Pitch.midi(this.toPitchNumber - 1, sign)))
-
   override def toString: String = {
     var octaves = "";
     if (octave >= 0) {
@@ -45,9 +42,6 @@ object PitchClass extends Enumeration {
 
   def apply(s: String): PitchClass = withName(s.toUpperCase)
   def toPitchNumber(p: PitchClass): Int = midi(p)
-//  def isIn(p: Int): Boolean = midi.map(_.swap).get(p) != None
-//  def getClass(p: Int): PitchClass.Value = midi.map(_.swap).get(p).get
-  //  def valueStream = Stream.continually(PitchClass.values).flatten
 }
 
 object PitchDecorator extends Enumeration {
@@ -97,14 +91,14 @@ object Pitch {
     case (1, _, _) => if(d._2 == Sharps) "Cis" else "Des"
     case (2, _, _) => "D"
     case (3, _, _) => if(d._2 == Sharps) "Dis" else "Es"
-    case (4, _, _) => if(d._2 == Flats && d._3 > 5) "Fes" else "E"
+    case (4, _, _) => if(d._2 == Flats && d._3 > 6) "Fes" else "E"
     case (5, _, _) => if(d._2 == Sharps && d._3 > 5) "Eis" else "F"
     case (6, _, _) => if(d._2 == Sharps) "Fis" else "Ges"
     case (7, _, _) => "G"
     case (8, _, _) => if(d._2 == Sharps) "Gis" else "As"
     case (9, _, _) => "A"
     case (10, _, _) => if(d._2 == Sharps) "Ais" else "Bes"
-    case (11, _, _) => if(d._2 == Flats && d._3 > 6) "Ces" else "B"
+    case (11, _, _) => if(d._2 == Flats && d._3 > 5) "Ces" else "B"
   }
 
   def apply(s: String): Pitch = s match {
@@ -123,6 +117,4 @@ object Pitch {
     }
     Pitch((midi(Math.abs((i + 48) % 12), signs._1, signs._2) + octaves))
   }
-
-  //  def apply(pitch: PitchClass.Value): Pitch = new Pitch(pitch, Blank, 0)
 }

@@ -8,7 +8,8 @@ class BassGenerator(val score: Score) {
 
   def generate(): Score = {
     val bassline = generate(score.style, extractChords().music)
-    score.copy(music = Seq(Staff(score.music(0).music :+ new Voice(bassline, "electric bass (finger)"))))
+    score.copy(music = score.music :+ Staff(Seq(new Voice(bassline, "electric bass (finger)"))))
+//    score.copy(music = Seq(Staff(score.music(0).music :+ new Voice(bassline, "electric bass (finger)"))))
   }
 
   def generate(style: Style, segments: Seq[Repeat]): Seq[Repeat] = {

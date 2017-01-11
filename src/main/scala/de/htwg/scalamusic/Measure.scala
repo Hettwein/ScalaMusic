@@ -7,11 +7,10 @@ case class Measure(
     tempo: Int = 100,
     elements: Seq[MusicElement] = Seq(),
     partial: Duration = null,
-    keyChange: Boolean = false,
     timeChange: Boolean = false,
+    keyChange: Boolean = false,
     clefChange: Boolean = false,
-    tempoChange: Boolean = false
-) extends Repeat {
+    tempoChange: Boolean = false) extends Repeat {
 
   override def asLy: String = s"""${if (timeChange) timeSignature.asLy else ""}${if (keyChange) key.asLy else ""}${if (clefChange) "\\" + Clef.toString(clef) else ""}${if (tempoChange) "\\tempo " + timeSignature.denominator + " = " + tempo + " " else ""}${if (partial != null) "\\partial " + partial.asLy + " " else ""}${elements.foldLeft("")((s, m) => s + m.asLy + " ")}|"""
   override def asDSL: String = s"""${if (timeChange) timeSignature.asDSL else ""}${if (keyChange) key.asDSL else ""}${if (clefChange) Clef.toString(clef) else ""}${if (tempoChange) "tempo " + tempo + " " else ""}${if (partial != null) "partial " + partial.asLy + " " else ""}${elements.foldLeft("")((s, m) => s + m.asDSL + " ")}|"""

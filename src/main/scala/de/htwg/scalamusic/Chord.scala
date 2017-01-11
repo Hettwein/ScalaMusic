@@ -2,45 +2,47 @@ package de.htwg.scalamusic
 
 import de.htwg.scalamusic._
 import scala.language.postfixOps
+import ScaleDegree._
 
 case class Chord(root: Pitch = Pitch(), quality: ChordQuality.Value = ChordQuality.Major, duration: Duration = Duration(1, 1), volume: Int = 70) extends MusicElement {
+  val scale = getScale;
   //umkehrungen??
   val music = quality match {
     case ChordQuality.Major =>
-      val scale = new MajorScale(root); Seq(root, scale.getDegreePitch(ScaleDegree.III), scale.getDegreePitch(ScaleDegree.V))
+      Seq(root, scale.getDegreePitch(III), scale.getDegreePitch(V))
     case ChordQuality.Minor =>
-      val scale = new MinorScale(root); Seq(root, scale.getDegreePitch(ScaleDegree.III), scale.getDegreePitch(ScaleDegree.V))
+      Seq(root, scale.getDegreePitch(III), scale.getDegreePitch(V))
     case ChordQuality.Seventh =>
-      val scale = new MajorScale(root); Seq(root, scale.getDegreePitch(ScaleDegree.III), scale.getDegreePitch(ScaleDegree.V), scale.getDegreePitch(ScaleDegree.VIIb))
+      Seq(root, scale.getDegreePitch(III), scale.getDegreePitch(V), scale.getDegreePitch(VII))
     case ChordQuality.MajorSeventh =>
-      val scale = new MajorScale(root); Seq(root, scale.getDegreePitch(ScaleDegree.III), scale.getDegreePitch(ScaleDegree.V), scale.getDegreePitch(ScaleDegree.VII))
+      Seq(root, scale.getDegreePitch(III), scale.getDegreePitch(V), scale.getDegreePitch(VII))
     case ChordQuality.MinorSeventh =>
-      val scale = new MinorScale(root); Seq(root, scale.getDegreePitch(ScaleDegree.III), scale.getDegreePitch(ScaleDegree.V), scale.getDegreePitch(ScaleDegree.VII))
+      Seq(root, scale.getDegreePitch(III), scale.getDegreePitch(V), scale.getDegreePitch(VII))
     case ChordQuality.SuspendedSecond =>
-      val scale = new MajorScale(root); Seq(root, scale.getDegreePitch(ScaleDegree.II), scale.getDegreePitch(ScaleDegree.V))
+      Seq(root, scale.getDegreePitch(II), scale.getDegreePitch(V))
     case ChordQuality.SuspendedFourth =>
-      val scale = new MajorScale(root); Seq(root, scale.getDegreePitch(ScaleDegree.IV), scale.getDegreePitch(ScaleDegree.V))
+      Seq(root, scale.getDegreePitch(IV), scale.getDegreePitch(V))
     case ChordQuality.Sixth =>
-      val scale = new MajorScale(root); Seq(root, scale.getDegreePitch(ScaleDegree.III), scale.getDegreePitch(ScaleDegree.V), scale.getDegreePitch(ScaleDegree.VI))
+      Seq(root, scale.getDegreePitch(III), scale.getDegreePitch(V), scale.getDegreePitch(VI))
     case ChordQuality.Fifth =>
-      val scale = new MajorScale(root); Seq(root, scale.getDegreePitch(ScaleDegree.V), scale.getDegreePitch(ScaleDegree.VIII))
-    case ChordQuality.Diminshed =>
-      val scale = new MajorScale(root); Seq(root, scale.getDegreePitch(ScaleDegree.IIIb), scale.getDegreePitch(ScaleDegree.Vb))
+      Seq(root, scale.getDegreePitch(V), scale.getDegreePitch(VIII))
+    case ChordQuality.Diminished =>
+      Seq(root, scale.getDegreePitch(III), scale.getDegreePitch(V))
     case ChordQuality.Augmented =>
-      val scale = new MajorScale(root); Seq(root, scale.getDegreePitch(ScaleDegree.III), scale.getDegreePitch(ScaleDegree.VIb))
+      Seq(root, scale.getDegreePitch(III), scale.getDegreePitch(VIb))
   }
 
-  def getScale(): Key = quality match { //??
+  def getScale(): Key = quality match {
     case ChordQuality.Major => MajorScale(root)
     case ChordQuality.Minor => MinorScale(root)
-    case ChordQuality.Seventh => MajorScale(root) //???
+    case ChordQuality.Seventh => MixolydianScale(root)
     case ChordQuality.MajorSeventh => MajorScale(root)
     case ChordQuality.MinorSeventh => MinorScale(root)
     case ChordQuality.SuspendedSecond => MajorScale(root)
     case ChordQuality.SuspendedFourth => MajorScale(root)
     case ChordQuality.Sixth => MajorScale(root)
     case ChordQuality.Fifth => MajorScale(root) //?
-    case ChordQuality.Diminshed => MajorScale(root) //?
+    case ChordQuality.Diminished => LocrianScale(root) //?
     case ChordQuality.Augmented => MajorScale(root) //?
   }
 
@@ -66,7 +68,7 @@ object Chord {
 
 object ChordQuality extends Enumeration {
   type ChordQuality = Value
-  val Major, Minor, Diminshed, Augmented, Seventh, MajorSeventh, MinorSeventh, Sixth, SuspendedSecond, SuspendedFourth, Fifth, Ninth = Value
+  val Major, Minor, Diminished, Augmented, Seventh, MajorSeventh, MinorSeventh, Sixth, SuspendedSecond, SuspendedFourth, Fifth, Ninth = Value
 
   private val abbr = Map(
     "" -> Major,
@@ -79,8 +81,9 @@ object ChordQuality extends Enumeration {
     ".6" -> Sixth,
     ".9" -> Ninth,
     ".sus2" -> SuspendedSecond,
-    ".sus4" -> SuspendedFourth
-  )
+    ".sus4" -> SuspendedFourth,
+    "aug" -> Augmented,
+    "dim" -> Diminished)
 
   def getAbbr(q: Value): String = abbr.map(_.swap).get(q).get
   def apply(s: String): ChordQuality = abbr(s)

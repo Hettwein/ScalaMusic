@@ -21,7 +21,7 @@ case class Duration(numerator: Int = 1, denominator: Int = 4, tied: Duration = n
 
   def getTied(): List[Duration] = {
     if(tied != null) {
-      List(this) ++ tied.getTied()
+      List(Duration(tied.numerator, tied.denominator)) ++ tied.getTied()
     } else {
       List()
     }

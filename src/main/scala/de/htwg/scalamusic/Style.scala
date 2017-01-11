@@ -138,12 +138,23 @@ object Reggae extends Style {
     0 -> List(p(null, d(3, 16)), p(VIII, d(1, 16)), p(VI, d(1, 8)), p(VIII, d(1, 16)), p(null, d(1, 16)), p(null, d(3, 16)), p(VIII, d(1, 16)), p(VI, d(1, 8)), p(V, d(1, 16)), p(null, d(1, 16))))
 }
 
+object Ska extends Style {
+  import ScaleDegree._
+  val name: String = "ska"
+  val pattern = Map(
+    0 -> List(p(I, d(1, 4)), p(III, d(1, 4)), p(V, d(1, 4)), p(III, d(1, 8)), p(I, d(1, 8))),
+    1 -> List(p(I, d(1, 4)), p(III, d(1, 4)), p(V, d(1, 4)), p(I, d(1, 4))))
+
+  val lick = Map(
+    0 -> List(p(VIII, d(1, 4)), p(VIII, d(1, 4)), p(VII, d(1, 4)), p(VI, d(1, 4))))
+}
+
 object Soul extends Style {
   import ScaleDegree._
   val name: String = "soul"
   val pattern = Map(
-    0 -> List(p(I, d(1, 4)), p(null, d(1, 8)), p(I, d(1, 8, d(1, 4))), p(IIIb, d(1, 8)), p(III, d(1, 8))),
-    1 -> List(p(I, d(1, 4)), p(null, d(1, 8)), p(I, d(1, 8)), p(I, d(1, 4)), p(IIIb, d(1, 8)), p(III, d(1, 8))),
+    0 -> List(p(I, d(1, 4)), p(null, d(1, 8)), p(I, d(1, 8, d(1, 4))), p(IIIb, d(1, 8)), p(IVb, d(1, 8))),
+    1 -> List(p(I, d(1, 4)), p(null, d(1, 8)), p(I, d(1, 8)), p(I, d(1, 4)), p(IIIb, d(1, 8)), p(IVb, d(1, 8))),
     2 -> List(p(I, d(1, 4)), p(null, d(1, 8)), p(I, d(1, 8)), p(I, d(1, 4)), p(null, d(1, 4))),
     3 -> List(p(I, d(1, 4)), p(null, d(1, 8)), p(I, d(1, 8, d(1, 4))), p(null, d(1, 8)), p(I, d(1, 8))))
 
