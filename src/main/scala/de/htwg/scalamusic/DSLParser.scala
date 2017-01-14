@@ -189,6 +189,7 @@ package object parser {
       //      
       //            val resultLy = Process("lilypond --pdf " + fileName + ".ly", new File(path)).!!
       val path = new File("./lilypond-output")
+      if (!path.exists()) path.mkdir()
       val fileName = s"rc-${System.currentTimeMillis()}"
       val bw = new BufferedWriter(new FileWriter(path + "/" + fileName + ".ly"))
       bw.write(generateLy(m))
