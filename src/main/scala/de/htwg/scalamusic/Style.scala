@@ -150,7 +150,7 @@ object Reggae extends Style { //generate"style 'reggae' chords( tempo 105 a:1 | 
   override def riff(a: Int, b: Int, l: Int): List[Shape] = pattern(a) ++ pattern(a) ++ lick(l) ++ pattern(a)
 
   val pattern = Map(
-    0 -> List(p(null, d(3, 16)), p(VIII, d(1, 16)), p(VI, d(1, 8)), p(VIII, d(1, 16)), p(null, d(1, 16)), p(null, d(3, 16)), p(VIII, d(1, 16)), p(VI, d(1, 8)), p(V, d(1, 16)), p(null, d(1, 16))),
+    0 -> List(p(null, d(1, 6)), p(VIII, d(1, 12)), p(VI, d(1, 6)), p(VIII, d(1, 12)), p(null, d(1, 6)), p(VIII, d(1, 12)), p(VI, d(1, 6)), p(V, d(1, 12))),
     1 -> List(p(I, d(1, 6)), p(I, d(1, 12)), p(I, d(1, 8)), p(null, d(1, 8)), p(I, d(1, 6)), p(I, d(1, 12)), p(null, d(1, 4)))
   )
 

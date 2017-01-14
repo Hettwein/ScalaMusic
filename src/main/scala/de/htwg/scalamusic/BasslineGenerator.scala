@@ -49,25 +49,25 @@ class BasslineGenerator(val score: Score) {
     var d = 0.0
     var n = 0
     var c = 0.0
+    var j = 0
     last = pattern
-    var triplets = false
-    for (i <- 0 until pattern.size; if (d < measureLength && ((pattern(i % pattern.size).duration.denominator % 3 == 0 && !triplets) || pattern(i % pattern.size).duration.denominator % 3 != 0))) yield { ////
+    for (i <- 0 until pattern.size; if (d < measureLength && ((pattern(i % pattern.size).duration.denominator % 3 == 0 && i >= j) || pattern(i % pattern.size).duration.denominator % 3 != 0))) yield { ////
       val p = pattern(i % pattern.size)
-      c = BigDecimal(c).setScale(7, BigDecimal.RoundingMode.HALF_UP).toDouble // 
       if (c >= chords(n).duration.getValue()) {
         c = c - chords(n).duration.getValue()
         n += 1
       }
       val chord: Chord = if (chords(n).isInstanceOf[Chord]) chords(n).asInstanceOf[Chord] else null
       if (chord != null) {
-        if (p.duration.denominator % 3 == 0 && !triplets) { // triplets
-          triplets = true
-          var j = i
+        if (p.duration.denominator % 3 == 0) { // triplets
+          j = i
           var m: Seq[MusicElement] = Seq()
-          while (pattern(j % pattern.size).duration.denominator % 3 == 0) { // group triplets
+          val o = c
+          while (pattern(j % pattern.size).duration.denominator % 3 == 0 && (c - o != 1.0 && c - o != 0.5 && c - o != 0.25 && c - o != 0.125 && c - o != 0.0625 && c - o != 0.03125)) { // group triplets
             val e = pattern(j % pattern.size)
             d += e.duration.getValue()
             c += e.duration.getValue()
+            c = BigDecimal(c).setScale(7, BigDecimal.RoundingMode.HALF_UP).toDouble //
             if (c > chords(n).duration.getValue()) {
               c = c - chords(n).duration.getValue()
               n += 1
@@ -80,7 +80,6 @@ class BasslineGenerator(val score: Score) {
           }
           Tuplet(3, m)
         } else {
-          triplets = false
           d += p.duration.getValue()
           c += p.duration.getValue()
           last = last.drop(1)
