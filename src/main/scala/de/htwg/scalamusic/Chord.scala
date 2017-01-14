@@ -83,7 +83,8 @@ object ChordQuality extends Enumeration {
     ".sus2" -> SuspendedSecond,
     ".sus4" -> SuspendedFourth,
     "aug" -> Augmented,
-    "dim" -> Diminished)
+    "dim" -> Diminished
+  )
 
   def getAbbr(q: Value): String = abbr.map(_.swap).get(q).get
   def apply(s: String): ChordQuality = abbr(s)

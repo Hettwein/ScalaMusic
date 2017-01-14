@@ -29,18 +29,18 @@ class ChordSpec extends WordSpec with Matchers {
       ChordQuality("m") should be(ChordQuality.Minor)
       ChordQuality("M") should be(ChordQuality.Major)
     }
-    "have a DSL representation" in {
-    	Chord().asDSL should be("cM:1")
-    	Chord(Pitch("es")).asDSL should be("eesM:1")
-    	Chord(Pitch("f"), ChordQuality.Minor, Duration(1, 2)).asDSL should be("fm:2")
-    	Chord(Pitch("d"), ChordQuality.Minor, Duration(3, 4)).asDSL should be("dm:2.")
-    }
-    "have a LilyPond representation" in {
-      Chord().asLy should be("< c e g >1")
-      Chord(Pitch("es")).asLy should be("< ees g bes >1")
-      Chord(Pitch("f"), ChordQuality.Minor, Duration(1, 2)).asLy should be("< f aes c' >2")
-      Chord(Pitch("d"), ChordQuality.Minor, Duration(3, 4)).asLy should be("< d f a >2.")
-    }
+    //    "have a DSL representation" in {
+    //      Chord().asDSL should be("cM:1")
+    //      Chord(Pitch("es")).asDSL should be("eesM:1")
+    //      Chord(Pitch("f"), ChordQuality.Minor, Duration(1, 2)).asDSL should be("fm:2")
+    //      Chord(Pitch("d"), ChordQuality.Minor, Duration(3, 4)).asDSL should be("dm:2.")
+    //    }
+    //    "have a LilyPond representation" in {
+    //      Chord().asLy should be("< c e g >1")
+    //      Chord(Pitch("es")).asLy should be("< ees g bes >1")
+    //      Chord(Pitch("f"), ChordQuality.Minor, Duration(1, 2)).asLy should be("< f aes c' >2")
+    //      Chord(Pitch("d"), ChordQuality.Minor, Duration(3, 4)).asLy should be("< d f a >2.")
+    //    }
   }
 
 }

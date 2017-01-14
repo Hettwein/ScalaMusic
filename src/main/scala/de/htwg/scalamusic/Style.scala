@@ -2,15 +2,13 @@ package de.htwg.scalamusic
 
 trait Style extends MusicConversion {
   val name: String
-  //  val patternA: Map[Int, Seq[Part]]
-  //  val patternB: Map[Int, Seq[Part]]
 
-  val pattern: Map[Int, List[Part]]
-  val lick: Map[Int, List[Part]]
-  def groove(a: Int, b: Int, l: Int): List[Part] = pattern(a) ++ pattern(b) ++ pattern(a) ++ lick(l)
+  val pattern: Map[Int, List[Shape]]
+  val lick: Map[Int, List[Shape]]
+  def riff(a: Int, b: Int, l: Int): List[Shape] = pattern(a) ++ pattern(a) ++ pattern(a) ++ lick(l)
 
   def d(a: Int, b: Int, c: Duration = null) = Duration(a, b, c)
-  def p(a: ScaleDegree.Value, b: Duration, c: Int = 0) = Part(b, a, c)
+  def p(a: ScaleDegree.Value, b: Duration, c: Int = 0) = Shape(b, a, c)
 
   def asLy: String = ""
   def asDSL: String = s"""style '${name}' """
@@ -22,11 +20,13 @@ object Rock extends Style {
   val pattern = Map(
     0 -> List(p(I, d(1, 8)), p(I, d(1, 8)), p(I, d(1, 8)), p(I, d(1, 8)), p(I, d(1, 8)), p(I, d(1, 8)), p(I, d(1, 8)), p(I, d(1, 8))),
     1 -> List(p(I, d(3, 8)), p(I, d(1, 8)), p(I, d(3, 8)), p(I, d(1, 8))),
-    2 -> List(p(I, d(1, 8)), p(I, d(1, 8, d(1, 8))), p(I, d(1, 8)), p(I, d(1, 8)), p(I, d(1, 8, d(1, 8))), p(I, d(1, 8))))
+    2 -> List(p(I, d(1, 8)), p(I, d(1, 8, d(1, 8))), p(I, d(1, 8)), p(I, d(1, 8)), p(I, d(1, 8, d(1, 8))), p(I, d(1, 8)))
+  )
   //    3 -> List(p(I, d(1, 4)), p(I, d(1, 4)), p(I, d(1, 4)), p(null, d(1, 8)), p(I, d(1, 8, d(1, 8))), p(I, d(1, 8, d(1, 8))), p(I, d(1, 8)), p(I, d(1, 8)), p(I, d(1, 8)), p(I, d(1, 8)), p(I, d(1, 8))))
 
   val lick = Map(
-    0 -> List(p(I, d(3, 8)), p(I, d(1, 8)), p(I, d(1, 2))))
+    0 -> List(p(I, d(3, 8)), p(I, d(1, 8)), p(I, d(1, 2)))
+  )
 }
 
 object Funk extends Style { //http://www.bassplayer.com/styles/1181/what-the-funk/25901
@@ -34,21 +34,28 @@ object Funk extends Style { //http://www.bassplayer.com/styles/1181/what-the-fun
   val name: String = "funk"
   val pattern = Map(
     0 -> List(p(I, d(1, 8)), p(VIII, d(1, 8)), p(I, d(1, 8)), p(VIII, d(1, 8)), p(I, d(1, 8)), p(VIII, d(1, 8)), p(I, d(1, 8)), p(VIII, d(1, 8))),
-    //    0 -> List(p(VIIb, d(1, 16), -1), p(I, d(1, 16)), p(null, d(1, 8)), p(I, d(1, 16)), p(null, d(1, 8)), p(I, d(1, 16)), p(null, d(1, 8)), p(I, d(1, 8)), p(IV, d(1, 8)), p(IIIb, d(1, 8))), //
-    1 -> List(p(I, d(1, 4)), p(null, d(1, 8)), p(null, d(1, 16)), p(I, d(1, 16)), p(I, d(1, 8)), p(I, d(1, 8)), p(null, d(1, 4))),
-    2 -> List(p(I, d(1, 16)), p(I, d(1, 16)), p(null, d(1, 8)), p(null, d(1, 8)), p(null, d(1, 16)), p(I, d(1, 16)), p(null, d(1, 2))),
-    3 -> List(p(I, d(1, 8)), p(VIII, d(1, 8)), p(null, d(1, 8)), p(I, d(1, 16)), p(I, d(1, 16)), p(null, d(1, 2))),
-    4 -> List(p(I, d(1, 4, d(1, 8, d(1, 16)))), p(I, d(1, 16)), p(I, d(1, 8)), p(I, d(1, 8, d(1, 4)))),
-    5 -> List(p(I, d(1, 8)), p(I, d(1, 8)), p(null, d(1, 4)), p(null, d(1, 8)), p(I, d(1, 8)), p(null, d(1, 16)), p(I, d(3, 16))))
+    1 -> List(p(I, d(1, 8)), p(VIII, d(1, 16)), p(VIII, d(1, 16)), p(I, d(1, 8)), p(VIII, d(1, 16)), p(VIII, d(1, 16)), p(I, d(1, 8)), p(VIII, d(1, 16)), p(VIII, d(1, 16)), p(I, d(1, 8)), p(VIII, d(1, 16)), p(VIII, d(1, 16))),
+    2 -> List(p(I, d(1, 4)), p(VIII, d(1, 8)), p(null, d(1, 16)), p(I, d(1, 16, d(1, 16))), p(null, d(1, 16)), p(I, d(1, 8)), p(VIII, d(1, 16)), p(VIII, d(1, 16)), p(I, d(1, 8))),
+    3 -> List(p(I, d(1, 4)), p(null, d(1, 8)), p(null, d(1, 16)), p(I, d(1, 16)), p(I, d(1, 8)), p(I, d(1, 8)), p(null, d(1, 4))),
+    4 -> List(p(I, d(1, 16)), p(I, d(1, 16)), p(null, d(1, 8)), p(null, d(1, 8)), p(null, d(1, 16)), p(I, d(1, 16)), p(null, d(1, 2))),
+    5 -> List(p(I, d(1, 8)), p(VIII, d(1, 8)), p(null, d(1, 8)), p(I, d(1, 16)), p(I, d(1, 16)), p(null, d(1, 2))),
+    6 -> List(p(I, d(1, 4, d(1, 8, d(1, 16)))), p(I, d(1, 16)), p(I, d(1, 8)), p(I, d(1, 8, d(1, 4)))),
+    7 -> List(p(I, d(1, 8)), p(I, d(1, 8)), p(null, d(1, 4)), p(null, d(1, 8)), p(I, d(1, 8)), p(null, d(1, 16)), p(I, d(3, 16)))
+  )
 
   val lick = Map(
     0 -> List(p(I, d(1, 8)), p(I, d(1, 8)), p(VIII, d(1, 16)), p(VIIb, d(1, 16)), p(V, d(1, 16)), p(I, d(1, 16)), p(null, d(1, 8)), p(null, d(1, 16)), p(IIIb, d(1, 16)), p(null, d(1, 4))),
-    1 -> List(p(I, d(1, 4, d(1, 8, d(1, 16)))), p(V, d(1, 16)), p(VIIb, d(1, 16)), p(V, d(1, 16)), p(VI, d(1, 16)), p(V, d(1, 16)), p(IV, d(1, 16)), p(V, d(1, 16)), p(IIIb, d(1, 16)), p(III, d(1, 16))))
+    1 -> List(p(I, d(1, 4, d(1, 8, d(1, 16)))), p(V, d(1, 16)), p(VIIb, d(1, 16)), p(V, d(1, 16)), p(VI, d(1, 16)), p(V, d(1, 16)), p(IV, d(1, 16)), p(V, d(1, 16)), p(IIIb, d(1, 16)), p(III, d(1, 16))),
+    2 -> List(p(I, d(1, 2)), p(VIIb, d(1, 16)), p(VIII, d(1, 16)), p(null, d(1, 8)), p(IV, d(1, 16)), p(V, d(1, 16)), p(null, d(1, 8)))
+  )
 }
 
 object Jazz extends Style {
   import ScaleDegree._
   val name: String = "jazz"
+
+  override def riff(a: Int, b: Int, l: Int): List[Shape] = pattern(a) ++ pattern(b) ++ pattern(a) ++ lick(l)
+
   val pattern = Map(
     0 -> List(p(I, d(1, 4)), p(I, d(1, 4)), p(I, d(1, 4)), p(I, d(1, 4))),
     1 -> List(p(I, d(1, 4)), p(I, d(1, 4)), p(V, d(1, 4)), p(V, d(1, 4))),
@@ -67,7 +74,8 @@ object Jazz extends Style {
     14 -> List(p(I, d(1, 4)), p(V, d(1, 4)), p(VII, d(1, 4)), p(VIII, d(1, 4))),
     15 -> List(p(VIII, d(1, 4)), p(V, d(1, 4)), p(III, d(1, 4)), p(V, d(1, 4))),
     16 -> List(p(I, d(1, 4)), p(I, d(1, 4)), p(V, d(1, 4)), p(I, d(1, 4))),
-    17 -> List(p(VIII, d(1, 4)), p(V, d(1, 4)), p(I, d(1, 4)), p(III, d(1, 4))))
+    17 -> List(p(VIII, d(1, 4)), p(V, d(1, 4)), p(I, d(1, 4)), p(III, d(1, 4)))
+  )
 
   val lick = Map(
     0 -> List(p(I, d(1, 4)), p(I, d(1, 4)), p(I, d(1, 4)), p(I, d(1, 4))),
@@ -87,19 +95,22 @@ object Jazz extends Style {
     14 -> List(p(I, d(1, 4)), p(V, d(1, 4)), p(VII, d(1, 4)), p(VIII, d(1, 4))),
     15 -> List(p(VIII, d(1, 4)), p(V, d(1, 4)), p(III, d(1, 4)), p(V, d(1, 4))),
     16 -> List(p(I, d(1, 4)), p(I, d(1, 4)), p(V, d(1, 4)), p(I, d(1, 4))),
-    17 -> List(p(VIII, d(1, 4)), p(V, d(1, 4)), p(I, d(1, 4)), p(III, d(1, 4))))
+    17 -> List(p(VIII, d(1, 4)), p(V, d(1, 4)), p(I, d(1, 4)), p(III, d(1, 4)))
+  )
 }
 
 object Swing extends Style {
   import ScaleDegree._
   val name: String = "swing"
   val pattern = Map(
-    0 -> List(p(I, d(1, 4)), p(null, d(1, 6)), p(I, d(1, 12)), p(I, d(1, 4)), p(null, d(1, 6)), p(I, d(1, 12))))
+    0 -> List(p(I, d(1, 4)), p(null, d(1, 6)), p(I, d(1, 12)), p(I, d(1, 4)), p(null, d(1, 6)), p(I, d(1, 12)))
+  )
 
   val lick = Map(
-    0 -> List(p(I, d(1, 4)), p(null, d(1, 6)), p(I, d(1, 12)), p(I, d(1, 6)), p(I, d(1, 12)), p(II, d(1, 6)), p(III, d(1, 12))))
+    0 -> List(p(I, d(1, 4)), p(null, d(1, 6)), p(I, d(1, 12)), p(I, d(1, 6)), p(I, d(1, 12)), p(II, d(1, 6)), p(III, d(1, 12)))
+  )
 
-  override def groove(a: Int, b: Int, l: Int): List[Part] = pattern(a) ++ lick(l) ++ pattern(b) ++ lick(l)
+  override def riff(a: Int, b: Int, l: Int): List[Shape] = pattern(a) ++ lick(l) ++ pattern(b) ++ lick(l)
 }
 
 object SlowRock extends Style {
@@ -107,12 +118,14 @@ object SlowRock extends Style {
   val name: String = "slowRock"
   val pattern = Map(
     0 -> List(p(I, d(1, 4)), p(I, d(1, 6)), p(III, d(1, 12)), p(V, d(1, 4)), p(III, d(1, 6)), p(V, d(1, 12))),
-    1 -> List(p(I, d(3, 4)), p(I, d(1, 4))))
+    1 -> List(p(I, d(3, 4)), p(I, d(1, 4)))
+  )
 
   val lick = Map(
     0 -> List(p(I, d(1, 4)), p(I, d(1, 6)), p(III, d(1, 12)), p(V, d(1, 4)), p(III, d(1, 6)), p(V, d(1, 12))),
     1 -> List(p(I, d(3, 4)), p(I, d(1, 4))),
-    2 -> List(p(VIII, d(1, 4)), p(VIIb, d(1, 4)), p(VI, d(1, 4)), p(V, d(1, 4))))
+    2 -> List(p(VIII, d(1, 4)), p(VIIb, d(1, 4)), p(VI, d(1, 4)), p(V, d(1, 4)))
+  )
 }
 
 object Boogie extends Style {
@@ -120,22 +133,30 @@ object Boogie extends Style {
   val name: String = "boogie"
   val pattern = Map(
     0 -> List(p(I, d(1, 8)), p(I, d(1, 8)), p(III, d(1, 8)), p(III, d(1, 8)), p(V, d(1, 8)), p(V, d(1, 8)), p(VI, d(1, 8)), p(V, d(1, 8))),
-    1 -> List(p(I, d(1, 4)), p(null, d(1, 8)), p(III, d(1, 8)), p(null, d(1, 4)), p(V, d(1, 4))))
+    1 -> List(p(I, d(1, 4)), p(null, d(1, 8)), p(III, d(1, 8)), p(null, d(1, 4)), p(V, d(1, 4)))
+  )
 
   val lick = Map(
     0 -> List(p(I, d(1, 8)), p(I, d(1, 8)), p(III, d(1, 8)), p(III, d(1, 8)), p(V, d(1, 8)), p(V, d(1, 8)), p(VI, d(1, 8)), p(V, d(1, 8))),
     1 -> List(p(null, d(1, 8)), p(I, d(1, 8)), p(I, d(1, 8)), p(I, d(1, 8)), p(I, d(1, 8)), p(I, d(1, 8)), p(I, d(1, 8)), p(I, d(1, 8))),
-    2 -> List(p(VIII, d(1, 4)), p(null, d(1, 8)), p(VI, d(1, 8)), p(null, d(1, 4)), p(V, d(1, 4))))
+    2 -> List(p(VIII, d(1, 4)), p(null, d(1, 8)), p(VI, d(1, 8)), p(null, d(1, 4)), p(V, d(1, 4)))
+  )
 }
 
-object Reggae extends Style {
+object Reggae extends Style { //generate"style 'reggae' chords( tempo 105 a:1 | a:1 | fism:2 d:2 | a:1 | )"
   import ScaleDegree._
   val name: String = "reggae"
+
+  override def riff(a: Int, b: Int, l: Int): List[Shape] = pattern(a) ++ pattern(a) ++ lick(l) ++ pattern(a)
+
   val pattern = Map(
-    0 -> List(p(null, d(3, 16)), p(VIII, d(1, 16)), p(VI, d(1, 8)), p(VIII, d(1, 16)), p(null, d(1, 16)), p(null, d(3, 16)), p(VIII, d(1, 16)), p(VI, d(1, 8)), p(V, d(1, 16)), p(null, d(1, 16))))
+    0 -> List(p(null, d(3, 16)), p(VIII, d(1, 16)), p(VI, d(1, 8)), p(VIII, d(1, 16)), p(null, d(1, 16)), p(null, d(3, 16)), p(VIII, d(1, 16)), p(VI, d(1, 8)), p(V, d(1, 16)), p(null, d(1, 16))),
+    1 -> List(p(I, d(1, 6)), p(I, d(1, 12)), p(I, d(1, 8)), p(null, d(1, 8)), p(I, d(1, 6)), p(I, d(1, 12)), p(null, d(1, 4)))
+  )
 
   val lick = Map(
-    0 -> List(p(null, d(3, 16)), p(VIII, d(1, 16)), p(VI, d(1, 8)), p(VIII, d(1, 16)), p(null, d(1, 16)), p(null, d(3, 16)), p(VIII, d(1, 16)), p(VI, d(1, 8)), p(V, d(1, 16)), p(null, d(1, 16))))
+    0 -> List(p(VIII, d(1, 6)), p(VIII, d(1, 12)), p(VII, d(1, 8)), p(null, d(1, 8)), p(VIII, d(1, 8)), p(null, d(1, 8)), p(V, d(1, 8)), p(null, d(1, 8)))
+  )
 }
 
 object Ska extends Style {
@@ -143,10 +164,12 @@ object Ska extends Style {
   val name: String = "ska"
   val pattern = Map(
     0 -> List(p(I, d(1, 4)), p(III, d(1, 4)), p(V, d(1, 4)), p(III, d(1, 8)), p(I, d(1, 8))),
-    1 -> List(p(I, d(1, 4)), p(III, d(1, 4)), p(V, d(1, 4)), p(I, d(1, 4))))
+    1 -> List(p(I, d(1, 4)), p(III, d(1, 4)), p(V, d(1, 4)), p(I, d(1, 4)))
+  )
 
   val lick = Map(
-    0 -> List(p(VIII, d(1, 4)), p(VIII, d(1, 4)), p(VII, d(1, 4)), p(VI, d(1, 4))))
+    0 -> List(p(VIII, d(1, 4)), p(VIII, d(1, 4)), p(VII, d(1, 4)), p(VI, d(1, 4)))
+  )
 }
 
 object Soul extends Style {
@@ -156,8 +179,10 @@ object Soul extends Style {
     0 -> List(p(I, d(1, 4)), p(null, d(1, 8)), p(I, d(1, 8, d(1, 4))), p(IIIb, d(1, 8)), p(IVb, d(1, 8))),
     1 -> List(p(I, d(1, 4)), p(null, d(1, 8)), p(I, d(1, 8)), p(I, d(1, 4)), p(IIIb, d(1, 8)), p(IVb, d(1, 8))),
     2 -> List(p(I, d(1, 4)), p(null, d(1, 8)), p(I, d(1, 8)), p(I, d(1, 4)), p(null, d(1, 4))),
-    3 -> List(p(I, d(1, 4)), p(null, d(1, 8)), p(I, d(1, 8, d(1, 4))), p(null, d(1, 8)), p(I, d(1, 8))))
+    3 -> List(p(I, d(1, 4)), p(null, d(1, 8)), p(I, d(1, 8, d(1, 4))), p(null, d(1, 8)), p(I, d(1, 8)))
+  )
 
   val lick = Map(
-    0 -> List(p(I, d(1, 4)), p(null, d(3, 4))))
+    0 -> List(p(I, d(1, 4)), p(null, d(3, 4)))
+  )
 }

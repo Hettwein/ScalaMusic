@@ -3,6 +3,7 @@ organization  := "de.htwg"
 version       := "0.0.1"
 scalaVersion  := "2.11.8"
 scalacOptions := Seq("-unchecked", "-feature", "-deprecation", "-encoding", "utf8")
+mainClass     := Some("Main")
 
 initialCommands in console := """
 import de.htwg.scalamusic._

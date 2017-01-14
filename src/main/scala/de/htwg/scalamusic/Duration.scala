@@ -20,7 +20,7 @@ case class Duration(numerator: Int = 1, denominator: Int = 4, tied: Duration = n
   def getValue(): Double = numerator.toDouble / denominator.toDouble + (if (tied != null) getTied.foldLeft(Duration(0, 1))((n, b) => n.sum(b)).getValue() else 0)
 
   def getTied(): List[Duration] = {
-    if(tied != null) {
+    if (tied != null) {
       List(Duration(tied.numerator, tied.denominator)) ++ tied.getTied()
     } else {
       List()

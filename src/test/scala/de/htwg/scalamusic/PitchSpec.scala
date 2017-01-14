@@ -9,10 +9,10 @@ import org.scalatest.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class PitchSpec extends WordSpec with Matchers {
   import parser._
-  
+
   "Pitches" should {
     "be easy to create from the REPL" in {
-//      val p1 = Pitch(60, KeySignatureSpelling.Sharps)
+      //      val p1 = Pitch(60, KeySignatureSpelling.Sharps)
       val p2 = Pitch(pitchClass = PitchClass.A)
       val p3 = Pitch(pitchClass = PitchClass.F, decorator = PitchDecorator.Sharp)
       val p4 = Pitch(pitchClass = PitchClass.B, decorator = PitchDecorator.Flat, octave = 2)
@@ -54,8 +54,8 @@ class PitchSpec extends WordSpec with Matchers {
     "be convertible to a midi number" in {
       Pitch(PitchClass.B, PitchDecorator.Flat, 2).toPitchNumber should be(34)
       Pitch().toPitchNumber should be(0)
-//      Pitch(7, KeySignatureSpelling.Sharps) should be(Pitch(PitchClass.G))
-//      Pitch(-5, KeySignatureSpelling.Sharps) should be(Pitch(PitchClass.G, octave = -1))
+      //      Pitch(7, KeySignatureSpelling.Sharps) should be(Pitch(PitchClass.G))
+      //      Pitch(-5, KeySignatureSpelling.Sharps) should be(Pitch(PitchClass.G, octave = -1))
     }
     "be able to use default values" in {
       val p = Pitch(PitchClass.C, PitchDecorator.Blank, 0)

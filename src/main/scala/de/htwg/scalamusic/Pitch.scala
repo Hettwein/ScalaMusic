@@ -86,19 +86,19 @@ object Pitch {
 
   private val r = """([a-g,A-G])(isis|is|eses|ses|es|s|)([,|']*)""".r
 
-  private def midi(d: (Int, KeySignatureSpelling.Value, Int)) = d match{
-    case (0, _, _) => if(d._2 == Sharps && d._3 > 6) "Bis" else "C"
-    case (1, _, _) => if(d._2 == Sharps) "Cis" else "Des"
+  private def midi(d: (Int, KeySignatureSpelling.Value, Int)) = d match {
+    case (0, _, _) => if (d._2 == Sharps && d._3 > 6) "Bis" else "C"
+    case (1, _, _) => if (d._2 == Sharps) "Cis" else "Des"
     case (2, _, _) => "D"
-    case (3, _, _) => if(d._2 == Sharps) "Dis" else "Es"
-    case (4, _, _) => if(d._2 == Flats && d._3 > 6) "Fes" else "E"
-    case (5, _, _) => if(d._2 == Sharps && d._3 > 5) "Eis" else "F"
-    case (6, _, _) => if(d._2 == Sharps) "Fis" else "Ges"
+    case (3, _, _) => if (d._2 == Sharps) "Dis" else "Es"
+    case (4, _, _) => if (d._2 == Flats && d._3 > 6) "Fes" else "E"
+    case (5, _, _) => if (d._2 == Sharps && d._3 > 5) "Eis" else "F"
+    case (6, _, _) => if (d._2 == Sharps) "Fis" else "Ges"
     case (7, _, _) => "G"
-    case (8, _, _) => if(d._2 == Sharps) "Gis" else "As"
+    case (8, _, _) => if (d._2 == Sharps) "Gis" else "As"
     case (9, _, _) => "A"
-    case (10, _, _) => if(d._2 == Sharps) "Ais" else "Bes"
-    case (11, _, _) => if(d._2 == Flats && d._3 > 5) "Ces" else "B"
+    case (10, _, _) => if (d._2 == Sharps) "Ais" else "Bes"
+    case (11, _, _) => if (d._2 == Flats && d._3 > 5) "Ces" else "B"
   }
 
   def apply(s: String): Pitch = s match {

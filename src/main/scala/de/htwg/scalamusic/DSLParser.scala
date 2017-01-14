@@ -1,7 +1,6 @@
 package de.htwg.scalamusic
 
 import scala.util.parsing.combinator.RegexParsers
-import scala.io.Source
 
 package object parser {
 
@@ -19,12 +18,8 @@ package object parser {
       tmp
     }
 
-    def digit: Parser[String] = """(0|1|2|3|4|5|6|7|8|9)""".r ^^ {
-      case d => d
-    }
-
-    def quantity: Parser[Int] = rep1(digit) ^^ {
-      case q => q.foldLeft("")((x, y) => x + y).toInt
+    def quantity: Parser[Int] = """(0|[1-9]\d*)""".r ^^ {
+      case q => q.toInt
     }
 
     def duration: Parser[Duration] = """(1|2|4|8|16|32)""".r ~ opt(".") ~ opt(rep1(("~" ~ opt("|")) ~> (element))) ^^ {
@@ -83,63 +78,20 @@ package object parser {
     }
 
     def measure: Parser[Measure] = opt("|") ~> opt(timeSignature) ~ opt(key) ~ opt(clef) ~ opt(tempo) ~ opt(partial) ~ rep1(element) <~ opt("|") ^^ {
-      case None ~ None ~ None ~ None ~ None ~ m => Measure(lastTime, lastKey, lastClef, lastTempo, m.flatten, tempoChange = startTempo)
-      case Some(t) ~ None ~ None ~ None ~ None ~ m =>
-        lastTime = t; Measure(t, lastKey, lastClef, lastTempo, m.flatten, timeChange = true, tempoChange = startTempo)
-      case Some(t) ~ Some(k) ~ None ~ None ~ None ~ m =>
-        lastTime = t; lastKey = k; Measure(t, k, lastClef, lastTempo, m.flatten, timeChange = true, keyChange = true, tempoChange = startTempo)
-      case Some(t) ~ None ~ Some(c) ~ None ~ None ~ m =>
-        lastTime = t; lastClef = c; Measure(t, lastKey, c, lastTempo, m.flatten, timeChange = true, clefChange = true, tempoChange = startTempo)
-      case Some(t) ~ None ~ None ~ Some(s) ~ None ~ m =>
-        lastTime = t; lastTempo = s; Measure(t, lastKey, lastClef, s, m.flatten, timeChange = true, tempoChange = true)
-      case Some(t) ~ Some(k) ~ Some(c) ~ None ~ None ~ m =>
-        lastTime = t; lastKey = k; lastClef = c; Measure(t, k, c, lastTempo, m.flatten, timeChange = true, keyChange = true, clefChange = true, tempoChange = startTempo)
-      case Some(t) ~ Some(k) ~ None ~ Some(s) ~ None ~ m =>
-        lastTime = t; lastKey = k; lastTempo = s; Measure(t, k, lastClef, s, m.flatten, keyChange = true, tempoChange = true)
-      case Some(t) ~ Some(k) ~ Some(c) ~ Some(s) ~ None ~ m =>
-        lastTime = t; lastKey = k; lastClef = c; lastTempo = s; Measure(t, k, c, s, m.flatten, timeChange = true, keyChange = true, clefChange = true, tempoChange = true)
-      case None ~ Some(k) ~ None ~ None ~ None ~ m =>
-        lastKey = k; Measure(lastTime, k, lastClef, lastTempo, m.flatten, keyChange = true, tempoChange = startTempo)
-      case None ~ Some(k) ~ Some(c) ~ None ~ None ~ m =>
-        lastKey = k; lastClef = c; Measure(lastTime, k, c, lastTempo, m.flatten, keyChange = true, clefChange = true, tempoChange = startTempo)
-      case None ~ Some(k) ~ None ~ Some(s) ~ None ~ m =>
-        lastKey = k; lastTempo = s; Measure(lastTime, k, lastClef, s, m.flatten, keyChange = true, tempoChange = true)
-      case None ~ Some(k) ~ Some(c) ~ Some(s) ~ None ~ m =>
-        lastKey = k; lastClef = c; lastTempo = s; Measure(lastTime, k, c, s, m.flatten, keyChange = true, clefChange = true, tempoChange = true)
-      case None ~ None ~ Some(c) ~ None ~ None ~ m =>
-        lastClef = c; Measure(lastTime, lastKey, c, lastTempo, m.flatten, clefChange = true, tempoChange = startTempo)
-      case None ~ None ~ Some(c) ~ Some(s) ~ None ~ m =>
-        lastClef = c; lastTempo = s; Measure(lastTime, lastKey, c, s, m.flatten, clefChange = true, tempoChange = true)
-      case None ~ None ~ None ~ Some(s) ~ None ~ m =>
-        lastTempo = s; Measure(lastTime, lastKey, lastClef, s, m.flatten, tempoChange = true)
-      case None ~ None ~ None ~ None ~ Some(p) ~ m => Measure(lastTime, lastKey, lastClef, lastTempo, m.flatten, p, tempoChange = startTempo)
-      case Some(t) ~ None ~ None ~ None ~ Some(p) ~ m =>
-        lastTime = t; Measure(t, lastKey, lastClef, lastTempo, m.flatten, p, timeChange = true, tempoChange = startTempo)
-      case Some(t) ~ Some(k) ~ None ~ None ~ Some(p) ~ m =>
-        lastTime = t; lastKey = k; Measure(t, k, lastClef, lastTempo, m.flatten, p, timeChange = true, keyChange = true, tempoChange = startTempo)
-      case Some(t) ~ None ~ Some(c) ~ None ~ Some(p) ~ m =>
-        lastTime = t; lastClef = c; Measure(t, lastKey, c, lastTempo, m.flatten, p, timeChange = true, clefChange = true, tempoChange = startTempo)
-      case Some(t) ~ None ~ None ~ Some(s) ~ Some(p) ~ m =>
-        lastTime = t; lastTempo = s; Measure(t, lastKey, lastClef, s, m.flatten, p, timeChange = true, tempoChange = true)
-      case Some(t) ~ Some(k) ~ Some(c) ~ None ~ Some(p) ~ m =>
-        lastTime = t; lastKey = k; lastClef = c; Measure(t, k, c, lastTempo, m.flatten, p, timeChange = true, keyChange = true, clefChange = true, tempoChange = startTempo)
-      case Some(t) ~ Some(k) ~ None ~ Some(s) ~ Some(p) ~ m =>
-        lastTime = t; lastKey = k; lastTempo = s; Measure(t, k, lastClef, s, m.flatten, p, timeChange = true, keyChange = true, tempoChange = true)
-      case Some(t) ~ Some(k) ~ Some(c) ~ Some(s) ~ Some(p) ~ m =>
-        lastTime = t; lastClef = c; lastTempo = s; Measure(t, k, c, s, m.flatten, p, timeChange = true, keyChange = true, clefChange = true, tempoChange = true)
-      case None ~ Some(k) ~ None ~ None ~ Some(p) ~ m =>
-        lastKey = k; Measure(lastTime, k, lastClef, lastTempo, m.flatten, p, keyChange = true, tempoChange = startTempo)
-      case None ~ Some(k) ~ Some(c) ~ None ~ Some(p) ~ m =>
-        lastKey = k; lastClef = c; Measure(lastTime, k, c, lastTempo, m.flatten, p, keyChange = true, clefChange = true, tempoChange = startTempo)
-      case None ~ Some(k) ~ None ~ Some(s) ~ Some(p) ~ m =>
-        lastKey = k; lastTempo = s; Measure(lastTime, k, lastClef, s, m.flatten, p, keyChange = true, tempoChange = true)
-      case None ~ Some(k) ~ Some(c) ~ Some(s) ~ Some(p) ~ m =>
-        lastKey = k; lastClef = c; lastTempo = s; Measure(lastTime, k, c, s, m.flatten, p, keyChange = true, clefChange = true, tempoChange = true)
-      case None ~ None ~ Some(c) ~ None ~ Some(p) ~ m =>
-        lastClef = c; Measure(lastTime, lastKey, c, lastTempo, m.flatten, p, clefChange = true, tempoChange = startTempo)
-      case None ~ None ~ Some(c) ~ Some(s) ~ Some(p) ~ m =>
-        lastClef = c; lastTempo = s; Measure(lastTime, lastKey, c, s, m.flatten, p, clefChange = true, tempoChange = true)
-      case None ~ None ~ None ~ Some(s) ~ Some(p) ~ m => lastTempo = s; Measure(lastTime, lastKey, lastClef, s, m.flatten, p, tempoChange = true)
+      case t ~ k ~ c ~ s ~ p ~ m => {
+        val time = t.getOrElse(lastTime)
+        val key = k.getOrElse(lastKey)
+        val clef = c.getOrElse(lastClef)
+        val tempo = s.getOrElse(lastTempo)
+        val partial = p.getOrElse(null)
+        if (lastTempo != tempo) startTempo
+        val measure = Measure(time, key, clef, tempo, m.flatten, partial, lastTime != time, lastKey != key, lastClef != clef, (lastTempo != tempo) || startTempo)
+        lastTime = time
+        lastKey = key
+        lastClef = clef
+        lastTempo = tempo
+        measure
+      }
     }
 
     def repeat: Parser[Repeat] = "|:" ~> rep1(measure | repeat) ~ opt(rep1("[" ~> rep1(measure) <~ "]")) <~ ":|" ^^ {
@@ -178,36 +130,45 @@ package object parser {
       case d ~ "/" ~ n => TimeSignature(d.toInt, n.toInt)
     }
 
-    def style: Parser[Style] = "style" ~> (opt("\'") ~> """([a-z,A-Z,0-9,(,), ]*)""".r) <~ opt("\'") ^^ {
-      case s => s match {
+    def style: Parser[Style] = "style" ~> ("\'" ~> """([a-z,A-Z,0-9,(,), ]*)""".r) <~ "\'" ^^ {
+      case s => s.toLowerCase() match {
         case "jazz" => Jazz
         case "rock" => Rock
         case "funk" => Funk
-        case "slowRock" => SlowRock
+        case "slowrock" => SlowRock
         case "swing" => Swing
         case "reggae" => Reggae
+        case "ska" => Ska
         case "boogie" => Boogie
         case "soul" => Soul
+        case _ => println("No such style!"); null
       }
     }
 
     def score: Parser[Score] = opt("(") ~> opt(style) ~ rep1(staff) <~ opt(")") ^^ {
-      case None ~ m => Score(music = m)
-      case Some(s) ~ m => Score(s, m)
+      case s ~ m => Score(s.getOrElse(null), m)
     }
 
     def apply(input: String): Score = parseAll(score, input) match {
-      case Success(result, _) => result
-      case failure: NoSuccess => scala.sys.error(failure.msg)
+      case Success(result, _) =>
+        resetDefaults(); result
+      case failure: NoSuccess => resetDefaults(); println("Input not valid!"); Score() //scala.sys.error(failure.msg)
     }
 
+    def resetDefaults() {
+      lastTime = TimeSignature()
+      lastKey = MajorScale(Pitch())
+      lastClef = Clef.treble
+      lastTempo = 100
+      setDefaultTempo = true
+    }
   }
 
   implicit class DSLHelper(val sc: StringContext) extends AnyVal {
     def m(args: Any*) = DSLParser(sc.parts(0)).asDSL
     def show(args: Any*) = ShowAsLy(DSLParser(sc.parts(0)))
     def ly(args: Any*) = ShowAsLy.generateLy(DSLParser(sc.parts(0)))
-    def generate(args: Any*) = { ShowAsLy(new BassGenerator(DSLParser(sc.parts(0))).generate) }
+    def generate(args: Any*) = { ShowAsLy(new BasslineGenerator(DSLParser(sc.parts(0))).generate) }
   }
 
   object DSLGenerator {
@@ -220,23 +181,25 @@ package object parser {
       import java.io._
       import sys.process._
 
-//      val path = new File(getClass.getResource("").getPath).getParentFile.getParentFile.getParentFile.getParentFile.getParent + "/lilypond-output"
-//      val fileName = s"rc-${System.currentTimeMillis()}"
-//      val bw = new BufferedWriter(new FileWriter(path + "/" + fileName + ".ly"))
-//      bw.write(generateLy(m))
-//      bw.close()
-//
-//      val resultLy = Process("lilypond --pdf " + fileName + ".ly", new File(path)).!!
-                  //val path = new File(getClass.getResource("").getPath).getParentFile.getParentFile.getParentFile.getParentFile.getParent + "/lilypond-output"
-                  val fileName = s"rc-${System.currentTimeMillis()}"
-                  val bw = new BufferedWriter(new FileWriter( /*/path + "/" + */ fileName + ".ly"))
-                		  bw.write(generateLy(m))
-                		  bw.close()
-                		  
-                		  val resultLy = Process("lilypond --pdf " + fileName + ".ly" /*, new File(path)*/ ).!!
+      //            val path = new File(getClass.getResource("").getPath).getParentFile.getParentFile.getParentFile.getParentFile.getParent + "/lilypond-output"
+      //            val fileName = s"rc-${System.currentTimeMillis()}"
+      //            val bw = new BufferedWriter(new FileWriter(path + "/" + fileName + ".ly"))
+      //            bw.write(generateLy(m))
+      //            bw.close()
+      //      
+      //            val resultLy = Process("lilypond --pdf " + fileName + ".ly", new File(path)).!!
+      val path = new File("./lilypond-output")
+      val fileName = s"rc-${System.currentTimeMillis()}"
+      val bw = new BufferedWriter(new FileWriter(path + "/" + fileName + ".ly"))
+      bw.write(generateLy(m))
+      bw.close()
+
+      val resultLy = Process("lilypond --pdf " + fileName + ".ly", path).!!
       //      println(resultLy)
-      //      Process(fileName + ".mid", new File(path)).!!
-      //      Process(fileName + ".pdf", new File(path)).!!
+      //      Process(path + fileName + ".mid").!!
+      //      Process(path + fileName + ".pdf").!!
+      java.awt.Desktop.getDesktop.open(new File(path + "/" + fileName + ".mid"))
+      java.awt.Desktop.getDesktop.open(new File(path + "/" + fileName + ".pdf"))
     }
 
     def generateLy(m: MusicConversion): String = {

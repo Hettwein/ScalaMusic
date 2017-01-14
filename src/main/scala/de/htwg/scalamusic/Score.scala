@@ -24,5 +24,5 @@ case class Score(style: Style = null, music: Seq[Staff] = Seq()) extends MusicCo
                               |  }
                               |}
                               |}""".stripMargin
-  override def asDSL: String = s"""( ${if(style != null) style.asDSL else ""}${music.foldLeft("")((s, m) => s + m.asDSL + " ")})"""
+  override def asDSL: String = s"""( ${if (style != null) style.asDSL else ""}${music.foldLeft("")((s, m) => s + m.asDSL + " ")})"""
 }
