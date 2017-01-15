@@ -152,7 +152,7 @@ package object parser {
     def apply(input: String): Score = parseAll(score, input) match {
       case Success(result, _) =>
         resetDefaults(); result
-      case failure: NoSuccess => resetDefaults(); println("Input not valid!"); Score() //scala.sys.error(failure.msg)
+      case failure: NoSuccess => resetDefaults(); println("Input not valid!"); null //scala.sys.error(failure.msg)
     }
 
     def resetDefaults() {
@@ -165,10 +165,22 @@ package object parser {
   }
 
   implicit class DSLHelper(val sc: StringContext) extends AnyVal {
-    def m(args: Any*) = DSLParser(sc.parts(0)).asDSL
-    def show(args: Any*) = ShowAsLy(DSLParser(sc.parts(0)))
-    def ly(args: Any*) = ShowAsLy.generateLy(DSLParser(sc.parts(0)))
-    def generate(args: Any*) = { ShowAsLy(new BasslineGenerator(DSLParser(sc.parts(0))).generate) }
+    def m(args: Any*) = {
+      val score = DSLParser(sc.parts(0))
+      if (score != null) score.asDSL
+    }
+    def show(args: Any*) = {
+      val score = DSLParser(sc.parts(0))
+      if (score != null) ShowAsLy(score)
+    }
+    def ly(args: Any*) = {
+      val score = DSLParser(sc.parts(0))
+      if (score != null) ShowAsLy.generateLy(score)
+    }
+    def generate(args: Any*) = {
+      val score = DSLParser(sc.parts(0))
+      if (score != null) ShowAsLy(new BasslineGenerator(DSLParser(sc.parts(0))).generate)
+    }
   }
 
   object DSLGenerator {
@@ -181,13 +193,6 @@ package object parser {
       import java.io._
       import sys.process._
 
-      //            val path = new File(getClass.getResource("").getPath).getParentFile.getParentFile.getParentFile.getParentFile.getParent + "/lilypond-output"
-      //            val fileName = s"rc-${System.currentTimeMillis()}"
-      //            val bw = new BufferedWriter(new FileWriter(path + "/" + fileName + ".ly"))
-      //            bw.write(generateLy(m))
-      //            bw.close()
-      //      
-      //            val resultLy = Process("lilypond --pdf " + fileName + ".ly", new File(path)).!!
       val path = new File("./lilypond-output")
       if (!path.exists()) path.mkdir()
       val fileName = s"rc-${System.currentTimeMillis()}"
@@ -196,9 +201,6 @@ package object parser {
       bw.close()
 
       val resultLy = Process("lilypond --pdf " + fileName + ".ly", path).!!
-      //      println(resultLy)
-      //      Process(path + fileName + ".mid").!!
-      //      Process(path + fileName + ".pdf").!!
       java.awt.Desktop.getDesktop.open(new File(path + "/" + fileName + ".mid"))
       java.awt.Desktop.getDesktop.open(new File(path + "/" + fileName + ".pdf"))
     }

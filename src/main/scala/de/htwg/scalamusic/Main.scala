@@ -10,10 +10,14 @@ object Main extends App {
   var running = true
   while (running) {
     StdIn.readLine("Please choose an option.\n") match {
-      case "m" => println(DSLParser(read).asDSL)
-      case "show" => ShowAsLy(DSLParser(read))
-      case "ly" => println(ShowAsLy.generateLy(DSLParser(read)))
-      case "generate" => ShowAsLy(new BasslineGenerator(DSLParser(read)).generate)
+      case "m" =>
+        val s = DSLParser(read); if (s != null) println(s.asDSL)
+      case "show" =>
+        val s = DSLParser(read); if (s != null) ShowAsLy(s)
+      case "ly" =>
+        val s = DSLParser(read); if (s != null) println(ShowAsLy.generateLy(s))
+      case "generate" =>
+        val s = DSLParser(read); if (s != null) ShowAsLy(new BasslineGenerator(s).generate)
       case "?" => help()
       case "q" => running = false
       case _ => println("Unkown option.")

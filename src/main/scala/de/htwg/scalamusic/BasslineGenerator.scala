@@ -46,10 +46,10 @@ class BasslineGenerator(val score: Score) {
 
   def applyPattern(chords: Seq[MusicElement], time: TimeSignature, pattern: Seq[Shape], measureLength: Double): Seq[MusicElement] = {
     val duration = pattern.foldLeft(0.0)((n, m) => n + m.duration.getValue())
-    var d = 0.0
-    var n = 0
-    var c = 0.0
-    var j = 0
+    var d = 0.0 //position in measure
+    var n = 0 //current chord
+    var c = 0.0 //position in chord
+    var j = 0 //already set triplets
     last = pattern
     for (i <- 0 until pattern.size; if (d < measureLength && ((pattern(i % pattern.size).duration.denominator % 3 == 0 && i >= j) || pattern(i % pattern.size).duration.denominator % 3 != 0))) yield { ////
       val p = pattern(i % pattern.size)
