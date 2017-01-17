@@ -108,7 +108,7 @@ package object parser {
       case i => i
     }
 
-    def chords: Parser[ChordProgression] = "chords(" ~> opt(instrument) ~ rep1(measure | repeat) <~ ")" ^^ {
+    def chords: Parser[ChordProgression] = ("chords" ~ "(") ~> opt(instrument) ~ rep1(measure | repeat) <~ ")" ^^ {
       case None ~ m => ChordProgression(music = m)
       case Some(i) ~ m => ChordProgression(m, i)
     }
@@ -201,7 +201,17 @@ package object parser {
       bw.close()
 
       val resultLy = Process("lilypond --pdf " + fileName + ".ly", path).!!
-      java.awt.Desktop.getDesktop.open(new File(path + "/" + fileName + ".mid"))
+      var file = new File(path + "/" + fileName + ".mid")
+      if (!file.exists()) {
+        file = new File(path + "/" + fileName + ".midi")
+        if (!file.exists()) {
+          file = new File(path + "/" + fileName + ".MID")
+          if (!file.exists()) {
+            file = new File(path + "/" + fileName + ".MIDI")
+          }
+        }
+      }
+      java.awt.Desktop.getDesktop.open(file)
       java.awt.Desktop.getDesktop.open(new File(path + "/" + fileName + ".pdf"))
     }
 

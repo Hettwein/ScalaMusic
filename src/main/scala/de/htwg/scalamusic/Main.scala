@@ -20,7 +20,7 @@ object Main extends App {
         val s = DSLParser(read); if (s != null) ShowAsLy(new BasslineGenerator(s).generate)
       case "?" => help()
       case "q" => running = false
-      case _ => println("Unkown option.")
+      case _ => println("Unknown option.")
     }
   }
 

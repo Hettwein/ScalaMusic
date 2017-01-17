@@ -25,6 +25,6 @@ the created files should be in a directory called 'lilypond-output' and should b
 If you just want to try out the DSL:
 
 1. [Java](https://java.com/de/download/) and [LilyPond](http://www.lilypond.org/index.html) have to be installed correctly (again: don't forget to add it to the 'Path')
-2. just download the files contained in the directory 'explore'
+2. just download the files contained in the directory 'bin'
 3. on Windows you can just run ScalaMusic.bat and get started
-4. else: open a terminal and navigate to these files, then enter `java -classpath ScalaMusic-assembly-0.0.1.jar de.htwg.scalamusic.Main`
+4. else: open a terminal and navigate to the right directory, then enter `java -classpath ScalaMusic-assembly-0.0.1.jar de.htwg.scalamusic.Main`

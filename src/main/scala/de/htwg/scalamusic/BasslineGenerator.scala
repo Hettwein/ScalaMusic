@@ -51,7 +51,7 @@ class BasslineGenerator(val score: Score) {
     var c = 0.0 //position in chord
     var j = 0 //already set triplets
     last = pattern
-    for (i <- 0 until pattern.size; if (d < measureLength && ((pattern(i % pattern.size).duration.denominator % 3 == 0 && i >= j) || pattern(i % pattern.size).duration.denominator % 3 != 0))) yield { ////
+    for (i <- 0 until (pattern.size * measureLength).toInt; if (d < measureLength && ((pattern(i % pattern.size).duration.denominator % 3 == 0 && i >= j) || pattern(i % pattern.size).duration.denominator % 3 != 0))) yield { ////
       val p = pattern(i % pattern.size)
       if (c >= chords(n).duration.getValue()) {
         c = c - chords(n).duration.getValue()
@@ -85,7 +85,7 @@ class BasslineGenerator(val score: Score) {
           last = last.drop(1)
           if (p.degree != null && chord != null) Note(if (p.octave > 0) chord.getScale.getDegreePitch(p.degree) else if (p.octave < 0 /* && chord.getScale.getDegreePitch(p.degree).-.-.toPitchNumber >*/ ) chord.getScale.getDegreePitch(p.degree).-.- else chord.getScale.getDegreePitch(p.degree)-, p.duration) else Rest(p.duration) //octave
         }
-      } else { //no chord ?
+      } else { //no chord
         //
         d += chords(n).duration.getValue()
         c += chords(n).duration.getValue()
