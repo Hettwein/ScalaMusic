@@ -189,30 +189,37 @@ package object parser {
 
   object ShowAsLy {
 
-    def apply(m: MusicConversion) = {
+    def apply(m: MusicConversion, fileName: String = s"rc-${System.currentTimeMillis()}") = {
       import java.io._
       import sys.process._
 
       val path = new File("./lilypond-output")
       if (!path.exists()) path.mkdir()
-      val fileName = s"rc-${System.currentTimeMillis()}"
-      val bw = new BufferedWriter(new FileWriter(path + "/" + fileName + ".ly"))
+
+      var fn = fileName
+      var i = 1
+      while (new File(path + "/" + fn + ".pdf").exists) {
+        fn = fileName + "(" + i + ")"
+        i += 1
+      }
+
+      val bw = new BufferedWriter(new FileWriter(path + "/" + fn + ".ly"))
       bw.write(generateLy(m))
       bw.close()
 
-      val resultLy = Process("lilypond --pdf " + fileName + ".ly", path).!!
-      var file = new File(path + "/" + fileName + ".mid")
+      val resultLy = Process("lilypond --pdf " + fn + ".ly", path).!!
+      var file = new File(path + "/" + fn + ".mid")
       if (!file.exists()) {
-        file = new File(path + "/" + fileName + ".midi")
+        file = new File(path + "/" + fn + ".midi")
         if (!file.exists()) {
-          file = new File(path + "/" + fileName + ".MID")
+          file = new File(path + "/" + fn + ".MID")
           if (!file.exists()) {
-            file = new File(path + "/" + fileName + ".MIDI")
+            file = new File(path + "/" + fn + ".MIDI")
           }
         }
       }
       java.awt.Desktop.getDesktop.open(file)
-      java.awt.Desktop.getDesktop.open(new File(path + "/" + fileName + ".pdf"))
+      java.awt.Desktop.getDesktop.open(new File(path + "/" + fn + ".pdf"))
     }
 
     def generateLy(m: MusicConversion): String = {
