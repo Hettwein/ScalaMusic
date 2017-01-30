@@ -25,10 +25,10 @@ the created files should be in a directory called 'lilypond-output' and should b
 If you want to use the DSL:
 
 1. [Java](https://java.com/de/download/) and [LilyPond](http://www.lilypond.org/index.html) have to be installed correctly (again: don't forget to add it to the 'Path')
-2. just download the files contained in the directory 'bin'
-3. on Windows you can just run ScalaMusic.bat and get started
-4. on Unix-based operating systems try ScalaMusic.sh
-5. else: open a terminal and navigate to the right directory, then enter `java -classpath ScalaMusic-assembly-0.0.1.jar de.htwg.scalamusic.Main`
+2. just download the files contained in the directory 'bin':
+the [jar](https://github.com/Hettwein/ScalaMusic/raw/master/bin/ScalaMusic-assembly-0.0.1.jar) and the script for [windows](https://raw.githubusercontent.com/Hettwein/ScalaMusic/master/bin/ScalaMusic.bat) or for [unix-based](https://raw.githubusercontent.com/Hettwein/ScalaMusic/master/bin/ScalaMusic.sh) operation systems
+3. you can just run the script ScalaMusic.bat or ScalaMusic.sh and get started
+4. else: open a terminal and navigate to the right directory, then enter `java -classpath ScalaMusic-assembly-0.0.1.jar de.htwg.scalamusic.Main`
 
 You need to create an input file first which contains your DSL string. Name it as you wish, the file extension doesn't matter.
 You can use spaces and newlines for better clarity inside the file.
