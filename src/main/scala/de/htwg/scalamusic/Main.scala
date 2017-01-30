@@ -23,7 +23,7 @@ object Main extends App {
             case "ly" =>
               val s = DSLParser(input); if (s != null) println("\n" + ShowAsLy.generateLy(s) + "\n")
             case "generate" =>
-              val s = DSLParser(input); if (s != null) ShowAsLy(new BasslineGenerator(s).generate, fn.split('.')(0))
+              val s = DSLParser(input); if (s != null) ShowAsLy(new BasslineGenerator(s).generate, fn.split(Array('\\', '/')).last.split('.')(0))
             case "?" => println(help())
             case "q" =>
               workingOnFile = false; if (StdIn.readLine("Do you want to work with another file? (y / n)\n") != "y") running = false
