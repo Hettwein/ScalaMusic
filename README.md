@@ -18,7 +18,10 @@ possible commands are:
 * `ly`:       returns the music object as LilyPond string
 * `show`:     creates a LilyPond file, a PDF and a MIDI file
 
-the created files should be in a directory called 'lilypond-output' and should be opened automatically
+The created files should be in a directory called 'lilypond-output' and should be opened automatically.
+
+For developing you can use Eclipse along with [Scala IDE](http://scala-ide.org/).
+You have to run `sbt compile` and `sbt eclipse` in the root directory to resolve the dependencies and creating the Eclipse project. Then you can open the project in Eclipse.
 
 ###User Guide:
 
