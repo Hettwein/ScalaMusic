@@ -2,7 +2,7 @@
 
 This project is originally based on [scala-music-dsl](https://github.com/RadicalCadence/scala-music-dsl).
 
-###Installation Guide for developers:
+### Installation Guide for developers:
 
 1. [Scala](http://www.scala-lang.org/), [SBT](http://www.scala-sbt.org/) and [LilyPond](http://www.lilypond.org/index.html) have to be installed correctly (especially make sure LilyPond is added to the environment variable 'Path')
 2. clone this repository
@@ -23,7 +23,7 @@ The created files should be in a directory called 'lilypond-output' and should b
 For developing you can use Eclipse along with [Scala IDE](http://scala-ide.org/).
 You have to run `sbt compile` and `sbt eclipse` in the root directory to resolve the dependencies and creating the Eclipse project. Then you can open the project in Eclipse.
 
-###User Guide:
+### User Guide:
 
 If you want to use the DSL:
 
@@ -38,7 +38,7 @@ You can use spaces and newlines for better clarity inside the file.
 
 
 
-###EBNF:
+### EBNF:
 
 A complete description of the DSL in the extended Backus–Naur form:
 
