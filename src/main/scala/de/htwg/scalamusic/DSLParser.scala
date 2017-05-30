@@ -22,7 +22,7 @@ package object parser {
       case q => q.toInt
     }
 
-    def duration: Parser[Duration] = """(1|2|4|8|16|32)""".r ~ opt(".") ~ opt(rep1(("~" ~ opt("|")) ~> (element))) ^^ {
+    def duration: Parser[Duration] = """(16|2|4|8|1|32)""".r ~ opt(".") ~ opt(rep1(("~" ~ opt("|")) ~> (element))) ^^ {
       case d ~ None ~ None => Duration(1, d.toInt)
       case d ~ Some(a) ~ None => Duration(3, 2 * d.toInt)
       case d ~ None ~ Some(tn) => Duration(1, d.toInt, tn(0).duration)
